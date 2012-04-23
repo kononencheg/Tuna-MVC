@@ -18,7 +18,7 @@ tuna.control.PageViewController = function() {
     tuna.control.ViewController.call(this);
 
     /**
-     * Модуль упарвления навигацией, страницей которого управляет данный
+     * Модуль упрaвления навигацией, страницей которого управляет данный
      * контроллер.
      *
      * @protected

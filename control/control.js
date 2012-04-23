@@ -67,13 +67,15 @@ tuna.control.getController = function(targetId) {
  *        корневого элемента выбирается <code>document.body</code>.
  */
 tuna.control.init = function(target) {
-    tuna.control.__mainController.init(target);
+    if (tuna.control.__mainController !== null) {
+        tuna.control.__mainController.init(target);
+    }
 };
 
 
 /**
  * @private
- * @type {Object.<string, tuna.control.ViewController>}
+ * @type {!Object.<string, !tuna.control.ViewController>}
  */
 tuna.control.__controllerTable = {};
 

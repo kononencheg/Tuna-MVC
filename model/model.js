@@ -5,7 +5,6 @@
  */
 tuna.model = {};
 
-
 /**
  * Обобщенная сериализация экземпряров модели данных.
  *
@@ -43,6 +42,19 @@ tuna.model.serialize = function(records, opt_options) {
  * Основная фабрика экземпляров модели данных приложения.
  *
  * @see tuna.model.RecordFactory
- * @type {!tuna.model.RecordFactory}
+ * @type {tuna.model.RecordFactory}
  */
-tuna.model.recordFactory = new tuna.model.RecordFactory();
+tuna.model.__recordFactory = null;
+
+/**
+ * Получение основной фабрики экземпляров модели данных.
+ *
+ * @return {!tuna.model.RecordFactory} Фабрика.
+ */
+tuna.model.getRecordFactory = function() {
+    if (tuna.model.__recordFactory === null) {
+        tuna.model.__recordFactory =  new tuna.model.RecordFactory();
+    }
+
+    return tuna.model.__recordFactory;
+};

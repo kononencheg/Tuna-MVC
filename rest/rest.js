@@ -1,4 +1,6 @@
 
+
+
 /**
  * @namespace Область имен классов предназначенных для работы с REST
  * интерфейсом.
@@ -19,7 +21,7 @@ tuna.rest = {};
  *        соответствует результат метода.
  */
 tuna.rest.call = function(name, args, opt_callback, opt_recordName) {
-    var method = tuna.rest.methodFactory.createMethod(name);
+    var method = tuna.rest.getMethodFactory().createMethod(name);
 
     var listener = null;
     if (opt_callback !== undefined) {
@@ -59,7 +61,9 @@ tuna.rest.call = function(name, args, opt_callback, opt_recordName) {
  *         единственный экземпляр данных.
  */
 tuna.rest.populateRecords = function(data, name) {
-    var recordPrototype = tuna.model.recordFactory.getRecordPrototype(name);
+    var recordPrototype = tuna.model.getRecordFactory()
+                                    .getRecordPrototype(name);
+
     if (recordPrototype !== null && data !== null) {
 
         var record = null;
@@ -99,4 +103,18 @@ tuna.rest.populateRecords = function(data, name) {
  * @see tuna.rest.MethodFactory
  * @type {tuna.rest.MethodFactory}
  */
-tuna.rest.methodFactory = new tuna.rest.MethodFactory();
+tuna.rest.__methodFactory = null;
+
+
+/**
+ * Получение основной фабрики методов приложения.
+ *
+ * @return {!tuna.rest.MethodFactory} Фабрика.
+ */
+tuna.rest.getMethodFactory = function() {
+    if (tuna.rest.__methodFactory === null) {
+        tuna.rest.__methodFactory =  new tuna.rest.MethodFactory();
+    }
+
+    return tuna.rest.__methodFactory;
+};
