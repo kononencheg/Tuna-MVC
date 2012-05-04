@@ -2,11 +2,11 @@
  * TODO: Button factory and stuff
  *
  * @constructor
- * @extends tuna.ui.ModuleInstance
+ * @extends tuna.ui.Widget
  * @param {!Node} target
  */
 tuna.ui.buttons.Button = function(target) {
-    tuna.ui.ModuleInstance.call(this, target);
+    tuna.ui.Widget.call(this, target);
 
     /**
      * @protected
@@ -15,7 +15,7 @@ tuna.ui.buttons.Button = function(target) {
     this._isInit = false;
 };
 
-tuna.utils.extend(tuna.ui.buttons.Button, tuna.ui.ModuleInstance);
+tuna.utils.extend(tuna.ui.buttons.Button, tuna.ui.Widget);
 
 /**
  * @override

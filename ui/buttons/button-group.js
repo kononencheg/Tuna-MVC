@@ -1,10 +1,10 @@
 /**
  * @constructor
- * @extends tuna.ui.ModuleInstance
+ * @extends tuna.ui.Widget
  * @param {!Node} target
  */
 tuna.ui.buttons.ButtonGroup = function(target) {
-    tuna.ui.ModuleInstance.call(this, target);
+    tuna.ui.Widget.call(this, target);
 
     /**
      * @private
@@ -21,7 +21,7 @@ tuna.ui.buttons.ButtonGroup = function(target) {
     this._setDefaultOption('button-selector', '.j-button');
 };
 
-tuna.utils.extend(tuna.ui.buttons.ButtonGroup, tuna.ui.ModuleInstance);
+tuna.utils.extend(tuna.ui.buttons.ButtonGroup, tuna.ui.Widget);
 
 /**
  * @param {string} action

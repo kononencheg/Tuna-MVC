@@ -1,10 +1,10 @@
 /**
  * @constructor
- * @extends tuna.ui.ModuleInstance
+ * @extends tuna.ui.Widget
  * @param {!Node} target
  */
 tuna.ui.forms.InputFilter = function(target) {
-    tuna.ui.ModuleInstance.call(this, target);
+    tuna.ui.Widget.call(this, target);
 
     /**
      * @private
@@ -39,7 +39,7 @@ tuna.ui.forms.InputFilter = function(target) {
     this._transformer = new tuna.ui.transformers.TemplateTransformer(target);
 };
 
-tuna.utils.extend(tuna.ui.forms.InputFilter, tuna.ui.ModuleInstance);
+tuna.utils.extend(tuna.ui.forms.InputFilter, tuna.ui.Widget);
 
 /**
  * @override
@@ -84,16 +84,12 @@ tuna.ui.forms.InputFilter.prototype.filter = function(term) {
     this.update();
 };
 
-/**
- *
- */
+
 tuna.ui.forms.InputFilter.prototype.update = function() {
     this._transformer.applyTransform(this._currentData);
 };
 
-/**
- *
- */
+
 tuna.ui.forms.InputFilter.prototype.clear = function() {
     this._input.value = '';
     this.filter('');

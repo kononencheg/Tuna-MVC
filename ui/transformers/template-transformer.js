@@ -1,11 +1,12 @@
 /**
  * @constructor
- * @extends tuna.ui.ModuleInstance
+ * @extends tuna.ui.Widget
  * @implements tuna.ui.transformers.ITransformer
  * @param {!Node} target
+ * @param {!tuna.ui.Container=} opt_container
  */
-tuna.ui.transformers.TemplateTransformer = function (target) {
-    tuna.ui.ModuleInstance.call(this, target);
+tuna.ui.transformers.TemplateTransformer = function (target, opt_container) {
+    tuna.ui.Widget.call(this, target, opt_container);
 
     /**
      * @private
@@ -22,7 +23,7 @@ tuna.ui.transformers.TemplateTransformer = function (target) {
 };
 
 tuna.utils.extend
-    (tuna.ui.transformers.TemplateTransformer, tuna.ui.ModuleInstance);
+    (tuna.ui.transformers.TemplateTransformer, tuna.ui.Widget);
 
 
 /**
@@ -63,11 +64,25 @@ tuna.ui.transformers.TemplateTransformer.prototype.applyTransform
     this.__template.applyData(new tuna.tmpl.data.DataNode(data));
 
     if (this.__transformHandler !== null) {
-        this.__transformHandler.handleTransformComplete(
-            this,
-            this.__template.fetchCreatedChildren(),
-            this.__template.fetchRemovedChildren()
-        );
+        var createdChildren = this.__template.fetchCreatedChildren();
+        var removedChildren = this.__template.fetchRemovedChildren();
+
+        if (this._container !== null) {
+            var i = createdChildren.length - 1;
+            while (i >= 0) {
+                this._container.initWidgets(createdChildren[i]);
+                i--;
+            }
+
+            i = removedChildren.length - 1;
+            while (i >= 0) {
+                this._container.destroyWidgets(removedChildren[i]);
+                i--;
+            }
+        }
+
+        this.__transformHandler.handleTransformComplete
+            (this, createdChildren, removedChildren);
     }
 };
 
@@ -80,9 +95,7 @@ tuna.ui.transformers.TemplateTransformer.prototype.destroy = function() {
     this.__transformHandler = null;
 };
 
-/**
- *
- */
+
 tuna.ui.transformers.TemplateTransformer.prototype.reset = function() {
     var transformHandler = this.__transformHandler;
 

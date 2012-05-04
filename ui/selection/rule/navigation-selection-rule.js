@@ -12,7 +12,7 @@ tuna.ui.selection.rule.NavigationSelectionRule = function() {
     this.__currentIndex = null;
 
     /**
-     * @type tuna.control.ViewController
+     * @type tuna.control.Controller
      * @private
      */
     this.__currentController = null;
@@ -67,7 +67,7 @@ tuna.ui.selection.rule.NavigationSelectionRule.prototype.getCurrentIndex
 };
 
 /**
- * @return {tuna.control.ViewController}
+ * @return {tuna.control.Controller}
  */
 tuna.ui.selection.rule.NavigationSelectionRule.prototype.getCurrentController
     = function() {
@@ -101,13 +101,13 @@ tuna.ui.selection.rule.NavigationSelectionRule.prototype.navigate
 tuna.ui.selection.rule.NavigationSelectionRule.prototype.selectIndex
     = function(index) {
 
-    if (this.isIndexEnabled(index) && this.__currentIndex !== index) {
+    /*if (this.isIndexEnabled(index) && this.__currentIndex !== index) {
 
         if (this.__currentIndex !== null) {
-            if (this.__currentController instanceof tuna.control.PageViewController &&
+            if (this.__currentController instanceof tuna.control.PageController &&
                 this.__currentController.canClose(index)) {
 
-                if (this.__currentController instanceof tuna.control.PageViewController) {
+                if (this.__currentController instanceof tuna.control.PageController) {
                     this.__currentController.close();
                 }
             }
@@ -125,12 +125,12 @@ tuna.ui.selection.rule.NavigationSelectionRule.prototype.selectIndex
         this._eventDispatcher.dispatch('open', this.__currentIndex);
 
         if (this.__currentController !== null &&
-            this.__currentController instanceof tuna.control.PageViewController) {
+            this.__currentController instanceof tuna.control.PageController) {
             this.__currentController.open(this.__openData);
         }
 
         return true;
-    }
+    }*/
 
     return false;
 };
@@ -141,7 +141,7 @@ tuna.ui.selection.rule.NavigationSelectionRule.prototype.selectIndex
 tuna.ui.selection.rule.NavigationSelectionRule.prototype.__updateController
     = function() {
 
-    this.__currentController = null;
+    /*this.__currentController = null;
     if (this.__currentIndex !== null) {
         var page = this._itemsCollection.getItemAt(this.__currentIndex);
         if (page !== null) {
@@ -150,14 +150,14 @@ tuna.ui.selection.rule.NavigationSelectionRule.prototype.__updateController
             if (this.__currentController !== null &&
                 !this.__currentController.isActive()) {
 
-                if (this.__currentController instanceof tuna.control.PageViewController) {
+                if (this.__currentController instanceof tuna.control.PageController) {
                     this.__currentController.setNavigation(this.__navigation);
                 }
 
                 this.__currentController.init(page);
             }
         }
-    }
+    }*/
 };
 
 /**

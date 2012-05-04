@@ -4,7 +4,7 @@
 tuna.ui.selection.rule.ISelectionRule = function() {};
 
 /**
- * @return Array.<string|number>
+ * @return {Array.<string|number>}
  */
 tuna.ui.selection.rule.ISelectionRule.prototype.getSelectedIndexes
     = function() {};
@@ -18,14 +18,11 @@ tuna.ui.selection.rule.ISelectionRule.prototype.selectIndex
 
 /**
  * @param {string|number} index
- * @return boolean
+ * @return {boolean}
  */
 tuna.ui.selection.rule.ISelectionRule.prototype.isSelected
     = function(index) {};
 
-/**
- *
- */
 tuna.ui.selection.rule.ISelectionRule.prototype.clearSelection = function() {};
 
 /**
@@ -37,7 +34,7 @@ tuna.ui.selection.rule.ISelectionRule.prototype.setIndexEnabled
 
 /**
  * @param {string|number} index
- * @return boolean
+ * @return {boolean}
  */
 tuna.ui.selection.rule.ISelectionRule.prototype.isIndexEnabled
     = function(index) {};

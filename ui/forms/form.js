@@ -1,10 +1,10 @@
 /**
  * @constructor
- * @extends tuna.ui.ModuleInstance
+ * @extends tuna.ui.Widget
  * @param {!Node} target
  */
 tuna.ui.forms.Form = function(target) {
-    tuna.ui.ModuleInstance.call(this, target);
+    tuna.ui.Widget.call(this, target);
 
     /**
      * @private
@@ -25,7 +25,7 @@ tuna.ui.forms.Form = function(target) {
     this.__recordName = null;
 };
 
-tuna.utils.extend(tuna.ui.forms.Form, tuna.ui.ModuleInstance);
+tuna.utils.extend(tuna.ui.forms.Form, tuna.ui.Widget);
 
 /**
  * @override
@@ -192,17 +192,13 @@ tuna.ui.forms.Form.prototype.setInputEnabled = function(name, isEnabled) {
     }
 };
 
-/**
- * 
- */
+
 tuna.ui.forms.Form.prototype.submit = function() {
     this.__prepareTo('submit');
     this._target.submit();
 };
 
-/**
- *
- */
+
 tuna.ui.forms.Form.prototype.reset = function() {
     this.__prepareTo('reset');
     this._target.reset();

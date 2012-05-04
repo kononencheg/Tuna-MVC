@@ -17,21 +17,19 @@ tuna.ui.selection.items.IItemsCollection.prototype.getItemIndex
     = function(item) {};
 
 /**
-* @param {string|number} index
-* @return {?Node}
-*/
+ * @param {string|number} index
+ * @return {?Node}
+ */
 tuna.ui.selection.items.IItemsCollection.prototype.getItemAt
     = function(index) {};
 
 /**
-* @param {function((string|number), Node)} callback
-*/
+ * @param {function((string|number), Node)} callback
+ */
 tuna.ui.selection.items.IItemsCollection.prototype.mapItems
     = function(callback) {};
 
-/**
- *
- */
+
 tuna.ui.selection.items.IItemsCollection.prototype.clear = function() {};
 
 /**

@@ -52,10 +52,6 @@ tuna.ui.selection.Carousel.prototype.init = function() {
     }
 };
 
-
-/**
- *
- */
 tuna.ui.selection.Carousel.prototype.next = function() {
     this.__shiftIndex++;
     if (this.getItemAt(this.__shiftIndex) === null) {
@@ -65,9 +61,6 @@ tuna.ui.selection.Carousel.prototype.next = function() {
     this.selectIndex(this.__shiftIndex);
 };
 
-/**
- *
- */
 tuna.ui.selection.Carousel.prototype.back = function() {
     this.__shiftIndex--;
     if (this.getItemAt(this.__shiftIndex) === null) {

@@ -1,10 +1,10 @@
 /**
  * @constructor
- * @extends tuna.ui.ModuleInstance
+ * @extends tuna.ui.Widget
  * @param {!Node} target
  */
 tuna.ui.popups.Popup = function(target) {
-    tuna.ui.ModuleInstance.call(this, target);
+    tuna.ui.Widget.call(this, target);
 
     /**
      * @private
@@ -14,7 +14,7 @@ tuna.ui.popups.Popup = function(target) {
 
 };
 
-tuna.utils.extend(tuna.ui.popups.Popup, tuna.ui.ModuleInstance);
+tuna.utils.extend(tuna.ui.popups.Popup, tuna.ui.Widget);
 
 /**
  * @override
@@ -48,27 +48,21 @@ tuna.ui.popups.Popup.prototype.isOpen = function() {
     return tuna.dom.hasClass(this._target, 'show');
 };
 
-/**
- *
- */
+
 tuna.ui.popups.Popup.prototype.open = function() {
     if (this.dispatch('open')) {
         this.__show();
     }
 };
 
-/**
- *
- */
+
 tuna.ui.popups.Popup.prototype.close = function() {
     if (this.dispatch('close')) {
         this.__hide();
     }
 };
 
-/**
- *
- */
+
 tuna.ui.popups.Popup.prototype.apply = function() {
     if (this.dispatch('apply', this.__collectData())) {
         this.__hide();

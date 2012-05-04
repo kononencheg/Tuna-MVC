@@ -4,7 +4,7 @@
 /**
  * Класс управления страницей отображения. Страница отображения представляет
  * собой DOM-элемент, являющийся элементом выделения модуля управлением
- * навигацией <code>tuna.ui.selection.Navigation</code>.
+ * навигацией {@link tuna.ui.selection.Navigation}.
  *
  * В данном классе к базовой логике работы класса управления отображением
  * добавлена логика обработки "открытия" и "закрытия" станицы отображения.
@@ -12,10 +12,10 @@
  * @see tuna.ui.selection.Navigation
  * @see tuna.ui.selection.rule.NavigationSelectionRule
  * @constructor
- * @extends {tuna.control.ViewController}
+ * @extends {tuna.control.Controller}
  */
-tuna.control.PageViewController = function() {
-    tuna.control.ViewController.call(this);
+tuna.control.PageController = function() {
+    tuna.control.Controller.call(this);
 
     /**
      * Модуль упрaвления навигацией, страницей которого управляет данный
@@ -27,7 +27,7 @@ tuna.control.PageViewController = function() {
     this._navigation = null;
 };
 
-tuna.utils.extend(tuna.control.PageViewController, tuna.control.ViewController);
+tuna.utils.extend(tuna.control.PageController, tuna.control.Controller);
 
 
 /**
@@ -37,7 +37,7 @@ tuna.utils.extend(tuna.control.PageViewController, tuna.control.ViewController);
  * @param {tuna.ui.selection.Navigation} navigation Модуль упарвления
  *        навигацией.
  */
-tuna.control.PageViewController.prototype.setNavigation = function(navigation) {
+tuna.control.PageController.prototype.setNavigation = function(navigation) {
     this._navigation = navigation;
 };
 
@@ -56,7 +56,7 @@ tuna.control.PageViewController.prototype.setNavigation = function(navigation) {
  * @param {string|number} index Индекс открываемой страницы.
  * @return {boolean} Возможность закрытия.
  */
-tuna.control.PageViewController.prototype.canClose = function(index) {
+tuna.control.PageController.prototype.canClose = function(index) {
     return true;
 };
 
@@ -68,7 +68,7 @@ tuna.control.PageViewController.prototype.canClose = function(index) {
  *
  * @see tuna.ui.selection.rule.NavigationSelectionRule
  */
-tuna.control.PageViewController.prototype.close = function() {};
+tuna.control.PageController.prototype.close = function() {};
 
 
 /**
@@ -82,5 +82,5 @@ tuna.control.PageViewController.prototype.close = function() {};
  *
  * @param {Object.<string, string>} args Данные сопуствующие открытию.
  */
-tuna.control.PageViewController.prototype.open = function(args) {};
+tuna.control.PageController.prototype.open = function(args) {};
 

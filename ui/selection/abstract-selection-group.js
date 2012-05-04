@@ -1,11 +1,11 @@
 /**
  * @constructor
- * @extends tuna.ui.ModuleInstance
+ * @extends tuna.ui.Widget
  * @implements tuna.ui.selection.ISelectionGroup
  * @param {!Node} target
  */
 tuna.ui.selection.AbstractSelectionGroup = function(target) {
-    tuna.ui.ModuleInstance.call(this, target);
+    tuna.ui.Widget.call(this, target);
 
     this._itemsCollection = null;
 
@@ -15,7 +15,7 @@ tuna.ui.selection.AbstractSelectionGroup = function(target) {
 
 
 tuna.utils.extend
-    (tuna.ui.selection.AbstractSelectionGroup, tuna.ui.ModuleInstance);
+    (tuna.ui.selection.AbstractSelectionGroup, tuna.ui.Widget);
 
 /**
  * @override

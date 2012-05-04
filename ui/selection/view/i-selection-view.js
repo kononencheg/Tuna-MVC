@@ -27,7 +27,4 @@ tuna.ui.selection.view.ISelectionView.prototype.disableItemAt
 tuna.ui.selection.view.ISelectionView.prototype.enableItemAt
     = function(index) {};
 
-/**
- *
- */
 tuna.ui.selection.view.ISelectionView.prototype.update = function() {};

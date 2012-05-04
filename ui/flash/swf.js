@@ -1,10 +1,10 @@
 /**
  * @constructor
- * @extends tuna.ui.ModuleInstance
+ * @extends tuna.ui.Widget
  * @param {!Node} target
  */
 tuna.ui.flash.SWF = function(target) {
-    tuna.ui.ModuleInstance.call(this, target);
+    tuna.ui.Widget.call(this, target);
 
     /**
      * @private
@@ -24,7 +24,7 @@ tuna.ui.flash.SWF = function(target) {
     this._setDefaultOption('allow-script-access', 'always');
 };
 
-tuna.utils.extend(tuna.ui.flash.SWF, tuna.ui.ModuleInstance);
+tuna.utils.extend(tuna.ui.flash.SWF, tuna.ui.Widget);
 
 /**
  * @override
@@ -58,7 +58,7 @@ tuna.ui.flash.SWF.prototype.init = function() {
 };
 
 /**
- *
+ * @override
  */
 tuna.ui.flash.SWF.prototype.destroy = function() {
     this._target.innerHTML = '';
@@ -66,9 +66,7 @@ tuna.ui.flash.SWF.prototype.destroy = function() {
     this.__movie = null;
 };
 
-/**
- *
- */
+
 tuna.ui.flash.SWF.prototype.reset = function() {
     this.destroy();
     this.init();

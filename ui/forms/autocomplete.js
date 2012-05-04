@@ -131,9 +131,7 @@ tuna.ui.forms.Autocomplete.prototype.__selectData = function(dataItem) {
     }
 };
 
-/**
- *
- */
+
 tuna.ui.forms.Autocomplete.prototype.clearSelection = function() {
     if (this.__selectedData !== null) {
         this.__selectedData = null;

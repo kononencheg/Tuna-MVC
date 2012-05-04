@@ -20,9 +20,7 @@ tuna.ui.selection.ISelectionGroup.prototype.selectIndex = function(index) {};
  */
 tuna.ui.selection.ISelectionGroup.prototype.isSelected = function(index) {};
 
-/**
- *
- */
+
 tuna.ui.selection.ISelectionGroup.prototype.clearSelection = function() {};
 
 /**
@@ -55,8 +53,6 @@ tuna.ui.selection.ISelectionGroup.prototype.getItemAt = function(index) {};
  */
 tuna.ui.selection.ISelectionGroup.prototype.mapItems = function(callback) {};
 
-/**
- *
- */
+
 tuna.ui.selection.ISelectionGroup.prototype.updateView = function() {};
 

@@ -1,10 +1,10 @@
 /**
  * @constructor
- * @extends tuna.ui.ModuleInstance
+ * @extends tuna.ui.Widget
  * @param {!Node} target
  */
 tuna.ui.selection.Navigation = function(target) {
-    tuna.ui.ModuleInstance.call(this, target);
+    tuna.ui.Widget.call(this, target);
 
     /**
      * @type {tuna.ui.selection.rule.NavigationSelectionRule}
@@ -19,8 +19,8 @@ tuna.ui.selection.Navigation = function(target) {
     this.__menuLinks = {};
 
     /**
-     * @protected
      * @type {tuna.ui.selection.Navigation}
+     * @private
      */
     this.__parent = null;
 
@@ -47,7 +47,7 @@ tuna.ui.selection.Navigation = function(target) {
     this._setDefaultOption('menu-selector', '.j-navigation-menu');
 };
 
-tuna.utils.extend(tuna.ui.selection.Navigation, tuna.ui.ModuleInstance);
+tuna.utils.extend(tuna.ui.selection.Navigation, tuna.ui.Widget);
 
 /**
  * @override
@@ -178,7 +178,7 @@ tuna.ui.selection.Navigation.prototype.__updateMenu = function(path, isSelected)
 };
 
 /**
- * @return {tuna.control.ViewController}
+ * @return {tuna.control.Controller}
  */
 tuna.ui.selection.Navigation.prototype.getCurrentController = function() {
     return this.__navigationRule.getCurrentController();
@@ -230,9 +230,7 @@ tuna.ui.selection.Navigation.prototype.isRoot = function() {
     return this.__parent === null;
 };
 
-/**
- *
- */
+
 tuna.ui.selection.Navigation.prototype.back = function() {
     if (this.isRoot()) {
         if (this.__history.length > 0) {
@@ -310,7 +308,7 @@ tuna.ui.selection.Navigation.prototype.navigatePath = function(path, data) {
 
 
 /**
- * @param {tuna.ui.ModuleInstance|tuna.ui.selection.Navigation} navigation
+ * @param {tuna.ui.Widget|tuna.ui.selection.Navigation} navigation
  */
 tuna.ui.selection.Navigation.prototype.addChild = function(navigation) {
     if (navigation instanceof tuna.ui.selection.Navigation) {
