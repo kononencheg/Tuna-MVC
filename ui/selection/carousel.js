@@ -1,10 +1,10 @@
 /**
  * @constructor
- * @extends tuna.ui.selection.SelectionGroup
+ * @extends tuna.ui.selection.NodeGroup
  * @param {!Node} target
  */
 tuna.ui.selection.Carousel = function(target) {
-    tuna.ui.selection.SelectionGroup.call(this, target, null);
+    tuna.ui.selection.NodeGroup.call(this, target, null);
 
     /**
      * @private
@@ -17,13 +17,13 @@ tuna.ui.selection.Carousel = function(target) {
     this._setDefaultOption('back-button-selector', '.j-carousel-back');
 };
 
-tuna.utils.extend(tuna.ui.selection.Carousel, tuna.ui.selection.SelectionGroup);
+tuna.utils.extend(tuna.ui.selection.Carousel, tuna.ui.selection.NodeGroup);
 
 /**
  * @override
  */
 tuna.ui.selection.Carousel.prototype.init = function() {
-    tuna.ui.selection.SelectionGroup.prototype.init.call(this);
+    tuna.ui.selection.NodeGroup.prototype.init.call(this);
 
     var self = this;
 

@@ -2,9 +2,10 @@
  * @constructor
  * @extends tuna.ui.Widget
  * @param {!Node} target
+ * @param {tuna.ui.Container=} opt_container
  */
-tuna.ui.forms.Form = function(target) {
-    tuna.ui.Widget.call(this, target);
+tuna.ui.forms.Form = function(target, opt_container) {
+    tuna.ui.Widget.call(this, target, opt_container);
 
     /**
      * @private

@@ -2,9 +2,10 @@
  * @constructor
  * @extends tuna.ui.Widget
  * @param {!Node} target
+ * @param {tuna.ui.Container=} opt_container
  */
-tuna.ui.popups.Popup = function(target) {
-    tuna.ui.Widget.call(this, target);
+tuna.ui.popups.Popup = function(target, opt_container) {
+    tuna.ui.Widget.call(this, target, opt_container);
 
     /**
      * @private
@@ -95,4 +96,12 @@ tuna.ui.popups.Popup.prototype.__collectData = function() {
     }
 
     return null;
+};
+
+
+/**
+ * @override
+ */
+tuna.ui.popups.Popup.prototype.clone = function(target, opt_container) {
+    return tuna.ui.popups.create(target, opt_container);
 };

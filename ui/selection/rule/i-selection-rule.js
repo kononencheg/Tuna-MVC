@@ -23,6 +23,7 @@ tuna.ui.selection.rule.ISelectionRule.prototype.selectIndex
 tuna.ui.selection.rule.ISelectionRule.prototype.isSelected
     = function(index) {};
 
+
 tuna.ui.selection.rule.ISelectionRule.prototype.clearSelection = function() {};
 
 /**

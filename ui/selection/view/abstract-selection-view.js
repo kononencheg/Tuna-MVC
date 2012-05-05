@@ -6,19 +6,20 @@ tuna.ui.selection.view.AbstractSelectionView = function() {
 
     /**
      * @protected
-     * @type tuna.ui.selection.items.IItemsCollection
+     * @type {tuna.ui.selection.items.AbstractWidgetCollection}
      */
     this._itemsCollection = null;
 
     /**
      * @protected
-     * @type tuna.ui.selection.rule.ISelectionRule
+     * @type {tuna.ui.selection.rule.AbstractSelectionRule}
      */
     this._selectionRule = null;
 };
 
+
 /**
- * @param {tuna.ui.selection.rule.ISelectionRule} rule
+ * @param {tuna.ui.selection.rule.AbstractSelectionRule} rule
  */
 tuna.ui.selection.view.AbstractSelectionView.prototype.setSelectionRule
     = function(rule) {
@@ -26,8 +27,9 @@ tuna.ui.selection.view.AbstractSelectionView.prototype.setSelectionRule
     this._selectionRule = rule;
 };
 
+
 /**
- * @param {tuna.ui.selection.items.IItemsCollection} collection
+ * @param {tuna.ui.selection.items.AbstractWidgetCollection} collection
  */
 tuna.ui.selection.view.AbstractSelectionView.prototype.setItemsCollection
     = function(collection) {
@@ -35,11 +37,13 @@ tuna.ui.selection.view.AbstractSelectionView.prototype.setItemsCollection
     this._itemsCollection = collection;
 };
 
+
 /**
  * @override
  */
 tuna.ui.selection.view.AbstractSelectionView.prototype.applySelectionAt
     = function(index) {};
+
 
 /**
  * @override
@@ -47,17 +51,20 @@ tuna.ui.selection.view.AbstractSelectionView.prototype.applySelectionAt
 tuna.ui.selection.view.AbstractSelectionView.prototype.destroySelectionAt
     = function(index) {};
 
+
 /**
  * @override
  */
 tuna.ui.selection.view.AbstractSelectionView.prototype.disableItemAt
     = function(index) {};
 
+
 /**
  * @override
  */
 tuna.ui.selection.view.AbstractSelectionView.prototype.enableItemAt
     = function(index) {};
+
 
 /**
  * @override

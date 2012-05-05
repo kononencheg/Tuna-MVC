@@ -9,8 +9,6 @@
  * В данном классе к базовой логике работы класса управления отображением
  * добавлена логика обработки "открытия" и "закрытия" станицы отображения.
  *
- * @see tuna.ui.selection.Navigation
- * @see tuna.ui.selection.rule.NavigationSelectionRule
  * @constructor
  * @extends {tuna.control.Controller}
  */
@@ -18,9 +16,6 @@ tuna.control.PageController = function() {
     tuna.control.Controller.call(this);
 
     /**
-     * Модуль упрaвления навигацией, страницей которого управляет данный
-     * контроллер.
-     *
      * @protected
      * @type {tuna.ui.selection.Navigation}
      */
@@ -31,16 +26,11 @@ tuna.utils.extend(tuna.control.PageController, tuna.control.Controller);
 
 
 /**
- * Установка соответсующего модуля упарвления навигацией.
- *
- * @see tuna.ui.selection.rule.NavigationSelectionRule
- * @param {tuna.ui.selection.Navigation} navigation Модуль упарвления
- *        навигацией.
+ * @param {tuna.ui.selection.Navigation} navigation
  */
 tuna.control.PageController.prototype.setNavigation = function(navigation) {
     this._navigation = navigation;
 };
-
 
 /**
  * Проверка возможности "закрытия" соответсующей контроллеру страницы
@@ -52,7 +42,6 @@ tuna.control.PageController.prototype.setNavigation = function(navigation) {
  * Реализация проверки возможности закрытия переопределяется в наследниках
  * класса.
  *
- * @see tuna.ui.selection.rule.NavigationSelectionRule
  * @param {string|number} index Индекс открываемой страницы.
  * @return {boolean} Возможность закрытия.
  */
@@ -66,7 +55,6 @@ tuna.control.PageController.prototype.canClose = function(index) {
  *
  * Реализация обработки закрытия переопределяется в наследниках класса.
  *
- * @see tuna.ui.selection.rule.NavigationSelectionRule
  */
 tuna.control.PageController.prototype.close = function() {};
 

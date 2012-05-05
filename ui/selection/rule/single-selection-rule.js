@@ -20,8 +20,8 @@ tuna.utils.extend(
 /**
  * @override
  */
-tuna.ui.selection.rule.SingleSelectionRule.prototype.getSelectedIndexes
-    = function() {
+tuna.ui.selection.rule.SingleSelectionRule.prototype.getSelectedIndexes =
+    function() {
 
     if (this.__currentIndex !== null) {
         return [this.__currentIndex];
@@ -33,8 +33,8 @@ tuna.ui.selection.rule.SingleSelectionRule.prototype.getSelectedIndexes
 /**
  * @override
  */
-tuna.ui.selection.rule.SingleSelectionRule.prototype.selectIndex
-    = function(index) {
+tuna.ui.selection.rule.SingleSelectionRule.prototype.selectIndex =
+    function(index) {
 
     if (this.isIndexEnabled(index) &&
         this.__currentIndex !== index &&
@@ -66,8 +66,8 @@ tuna.ui.selection.rule.SingleSelectionRule.prototype.selectIndex
  * @private
  * @param {string|number} newIndex
  */
-tuna.ui.selection.rule.SingleSelectionRule.prototype.__dispatchSelect
-    = function(newIndex) {
+tuna.ui.selection.rule.SingleSelectionRule.prototype.__dispatchSelect =
+    function(newIndex) {
 
     var oldIndex = this.__currentIndex;
 
@@ -79,8 +79,8 @@ tuna.ui.selection.rule.SingleSelectionRule.prototype.__dispatchSelect
 /**
  * @override
  */
-tuna.ui.selection.rule.SingleSelectionRule.prototype.isSelected
-    = function(index) {
+tuna.ui.selection.rule.SingleSelectionRule.prototype.isSelected =
+    function(index) {
 
     return index === this.__currentIndex;
 };
@@ -88,8 +88,8 @@ tuna.ui.selection.rule.SingleSelectionRule.prototype.isSelected
 /**
  * @override
  */
-tuna.ui.selection.rule.SingleSelectionRule.prototype.clearSelection
-    = function() {
+tuna.ui.selection.rule.SingleSelectionRule.prototype.clearSelection =
+    function() {
 
     if (this.__currentIndex !== null) {
         this._selectionView.destroySelectionAt(this.__currentIndex);

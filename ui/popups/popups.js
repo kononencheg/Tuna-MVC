@@ -1,8 +1,11 @@
+
+
 /**
  * @private
- * @type {Object.<string, tuna.ui.popups.Popup>}
+ * @type {!Object.<string, !tuna.ui.popups.Popup>}
  */
 tuna.ui.popups.__idTable = {};
+
 
 /**
  * @private
@@ -10,17 +13,19 @@ tuna.ui.popups.__idTable = {};
  */
 tuna.ui.popups.__lastId = 0;
 
+
 /**
  * @param {!Node} target
- * @return {tuna.ui.popups.Popup}
+ * @param {tuna.ui.Container=} opt_container
+ * @return {!tuna.ui.popups.Popup}
  */
-tuna.ui.popups.create = function(target) {
+tuna.ui.popups.create = function(target, opt_container) {
     if (target.id === '') {
         target.id = 'popup_' + tuna.ui.popups.__lastId++;
     }
 
     if (tuna.ui.popups.__idTable[target.id] === undefined) {
-        var popup = new tuna.ui.popups.Popup(target);
+        var popup = new tuna.ui.popups.Popup(target, opt_container);
         popup.init();
 
         tuna.ui.popups.__idTable[target.id] = popup;
@@ -29,17 +34,20 @@ tuna.ui.popups.create = function(target) {
     return tuna.ui.popups.__idTable[target.id];
 };
 
+
 /**
  * @private
  * @type tuna.ui.popups.Popup
  */
 tuna.ui.popups.__alert = null;
 
+
 /**
  * @private
  * @type Node
  */
 tuna.ui.popups.__alertMessage = null;
+
 
 /**
  * @param {Node} target
@@ -59,6 +67,7 @@ tuna.ui.popups.registerAlert = function(target) {
 
 };
 
+
 /**
  * @param {string} message
  */
@@ -70,17 +79,20 @@ tuna.ui.popups.alert = function(message) {
     }
 };
 
+
 /**
  * @private
  * @type tuna.ui.popups.Popup
  */
 tuna.ui.popups.__confirm = null;
 
+
 /**
  * @private
  * @type Node
  */
 tuna.ui.popups.__confirmMessage = null;
+
 
 /**
  * @param {Node} target
@@ -98,6 +110,7 @@ tuna.ui.popups.registerConfirm = function(target) {
         }
     }
 };
+
 
 /**
  * @param {string} message

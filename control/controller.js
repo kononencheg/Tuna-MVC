@@ -25,7 +25,7 @@ tuna.control.Controller = function() {
      * @type {function()}
      * @private
      */
-    this.__initActions = tuna.utils.bind(this.initActions, this);
+    this._initActions = tuna.utils.bind(this.initActions, this);
 
     /**
      * @type {function()}
@@ -47,13 +47,13 @@ tuna.control.Controller = function() {
  */
 tuna.control.Controller.prototype.setContainer = function(container) {
     if (this._container !== null) {
-        this._container.removeEventListener('init', this.__initActions);
+        this._container.removeEventListener('init', this._initActions);
         this._container.removeEventListener('destroy', this.__destroyActions);
     }
 
     this._container = container;
 
-    this._container.addEventListener('init', this.__initActions);
+    this._container.addEventListener('init', this._initActions);
     this._container.addEventListener('destroy', this.__destroyActions);
 };
 

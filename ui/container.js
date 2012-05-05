@@ -10,7 +10,6 @@
  * @event <code>init</code> - При инициализации виджетов целевого DOM-элемента.
  * @event <code>destroy</code> - При уничтожении всех проинициализорованных
  *        виджетов.
- * @see tuna.ui.MarkupWidgetFactory
  * @see tuna.ui.Widget
  * @constructor
  * @extends {tuna.ui.Widget}
@@ -30,7 +29,7 @@ tuna.ui.Container = function(target, opt_container) {
      * @type {!Object.<string, !Object.<string, !Array.<!tuna.ui.Widget>>>}
      * @private
      */
-    this.__instances = {};
+    this.__idWidgets = {};
 };
 
 
@@ -44,7 +43,6 @@ tuna.ui.Container.prototype.init = function() {
     this.__widgetTypes = this.getArrayOption('widgets');
 
     this.initWidgets(this._target);
-
     this.dispatch('init');
 };
 
@@ -54,8 +52,17 @@ tuna.ui.Container.prototype.init = function() {
  */
 tuna.ui.Container.prototype.destroy = function() {
     this.dispatch('destroy');
-    for (var targetId in this.__instances) {
-        this.__destroyWidgetsByTargetId(targetId);
+
+    for (var id in this.__idWidgets) {
+        var typeWidgets = this.__idWidgets[id];
+
+        for (var type in typeWidgets) {
+            while (typeWidgets[type].length) {
+                typeWidgets[type].shift().destroy();
+            }
+        }
+
+        delete this.__idWidgets[id];
     }
 };
 
@@ -69,7 +76,6 @@ tuna.ui.Container.prototype.destroy = function() {
  *
  * TODO: Возвращать список виджетов контейнера.
  *
- * @see tuna.ui.MarkupWidgetFactory#initWidgets
  * @param {!Node} target DOM-элемент в котором требуется проинициализировать
  *        виджеты.
  */
@@ -78,81 +84,44 @@ tuna.ui.Container.prototype.initWidgets = function(target) {
         target.id = 'container_' + tuna.ui.__lastId++;
     }
 
-    var targetId = target.id;
-    if (this.__instances[targetId] === undefined) {
-        this.__instances[targetId] = {};
+    var id = target.id;
+    if (this.__idWidgets[id] === undefined) {
+        this.__idWidgets[id] = {};
     }
-
-    var instances = this.__instances[targetId];
 
     var i = 0,
         l = this.__widgetTypes.length;
 
     var type = null;
-    var factory = null;
+    var targets = null;
     while (i < l) {
         type = this.__widgetTypes[i];
-        factory = tuna.ui.getFactory(type);
+        targets = tuna.ui.findWidgetsTargets(type, target, false);
 
-        if (factory !== null) {
-            if (instances[type] === undefined) {
-                instances[type] = [];
-            }
-
-            instances[type] =
-                instances[type].concat(factory.initWidgets(target, this));
-
-        } else {
-            throw 'Unknown widget type "' + type + '"';
-        }
-
+        this.__idWidgets[id][type] =
+            tuna.ui.createWidgets(type, targets, true, this);
+        
         i++;
     }
 };
 
 
 /**
- * Уничтожение всех виджетов проинициализированных в выбранном DOM-элементе
- * контейнера.
- *
- * @param {!Node} target DOM-элемент в контейнере, виджеты которого необходимо
- *        уничтожить.
+ * @param {!Node} target 
  */
 tuna.ui.Container.prototype.destroyWidgets = function(target) {
-    if (target.id !== null) {
-        this.__destroyWidgetsByTargetId(target.id);
-    }
-};
+    var id = target.id;
+    if (id !== null && this.__idWidgets[id] !== undefined) {
+        var typeWidgets = this.__idWidgets[id];
 
-
-/**
- * Получение всех виджетов определенного типа. В случе если выбран DOM-элемент,
- * будут выданы виджеты ранее в нем проинициализированные.
- *
- * @param {string} type Тип модуля отображения.
- * @param {!Node=} opt_target DOM-элемент модули которого н еобходимо вренуть.
- * @return {!Array.<!tuna.ui.Widget>} Массив модулей отображения.
- */
-tuna.ui.Container.prototype.getWidgets = function(type, opt_target) {
-    var result = [];
-
-    var targetId = null;
-    if (opt_target !== undefined) {
-        targetId = opt_target.id;
-        if (this.__instances[targetId] !== undefined &&
-            this.__instances[targetId][type] !== undefined) {
-            result = this.__instances[targetId][type];
-        }
-    } else {
-        for (targetId in this.__instances) {
-            if (this.__instances[targetId][type] !== undefined) {
-                result = result.concat(this.__instances[targetId][type]);
+        for (var type in typeWidgets) {
+            while (typeWidgets[type].length) {
+                typeWidgets[type].shift().destroy();
             }
         }
+
+        delete this.__idWidgets[id];
     }
-
-
-    return result;
 };
 
 
@@ -162,45 +131,49 @@ tuna.ui.Container.prototype.getWidgets = function(type, opt_target) {
  * @see tuna.ui.Widget#getName
  * @param {string} type Тип виждета.
  * @param {string} name Имя экземпляра виждета.
+ * @param {!Node=} opt_target
  * @return {tuna.ui.Widget} Виджет.
  */
-tuna.ui.Container.prototype.getWidget = function(type, name) {
+tuna.ui.Container.prototype.getWidget = function(type, name, opt_target) {
+    var id = null;
+    if (opt_target !== undefined) {
+        id = opt_target.id;
+        if (id !== null && this.__idWidgets[id] !== undefined) {
+            return this.__findWidget(type, name, id);
+        }
+    } else {
+        var widget = null;
 
-    for (var targetId in this.__instances) {
-        if (this.__instances[targetId][type] !== undefined) {
-            var instances = this.__instances[targetId][type];
-
-            var i = 0,
-                l = instances.length;
-
-            while (i < l) {
-                if (instances[i].getName() === name) {
-                    return instances[i];
-                }
-
-                i++;
+        for (id in this.__idWidgets) {
+            widget = this.__findWidget(type, name, id);
+            if (widget !== null) {
+                break;
             }
         }
+
+        return widget;
     }
 
     return null;
 };
 
-
 /**
- * @param {string} targetId
+ *
+ * @param {string} type
+ * @param {string} name
+ * @param {string} id
  * @private
  */
-tuna.ui.Container.prototype.__destroyWidgetsByTargetId = function(targetId) {
-    var factory = null;
-    for (var name in this.__instances[targetId]) {
-        factory = tuna.ui.getFactory(name);
-        if (factory !== null) {
-            factory.destroyWidgets(this.__instances[targetId][name]);
+tuna.ui.Container.prototype.__findWidget = function(type, name, id) {
+    var typeWidgets = this.__idWidgets[id][type];
+    var i = typeWidgets.length - 1;
+    while (i >= 0) {
+        if (name === typeWidgets[i].getName()) {
+            return typeWidgets[i];
         }
 
-        this.__instances[targetId][name].length = 0;
+        i--
     }
 
-    delete this.__instances[targetId];
+    return null;
 };

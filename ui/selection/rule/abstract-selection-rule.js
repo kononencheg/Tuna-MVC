@@ -6,19 +6,19 @@ tuna.ui.selection.rule.AbstractSelectionRule = function() {
 
     /**
      * @protected
-     * @type tuna.ui.selection.items.IItemsCollection
+     * @type {tuna.ui.selection.items.IWidgetCollection}
      */
     this._itemsCollection = null;
 
     /**
      * @protected
-     * @type tuna.ui.selection.view.ISelectionView
+     * @type {tuna.ui.selection.view.ISelectionView}
      */
     this._selectionView = null;
 
     /**
      * @protected
-     * @type tuna.events.EventDispatcher
+     * @type {tuna.events.EventDispatcher}
      */
     this._eventDispatcher = null;
 
@@ -31,7 +31,7 @@ tuna.ui.selection.rule.AbstractSelectionRule = function() {
 };
 
 /**
- * @param {tuna.ui.selection.items.IItemsCollection} collection
+ * @param {tuna.ui.selection.items.IWidgetCollection} collection
  */
 tuna.ui.selection.rule.AbstractSelectionRule.prototype.setItemsCollection
     = function(collection) {

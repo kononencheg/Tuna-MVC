@@ -20,9 +20,9 @@ tuna.ui.forms.Autocomplete = function(target) {
 
     /**
      * @private
-     * @type tuna.ui.selection.SelectionGroup
+     * @type tuna.ui.selection.NodeGroup
      */
-    this.__selectionGroup = new tuna.ui.selection.SelectionGroup(target, null);
+    this.__selectionGroup = new tuna.ui.selection.NodeGroup(target, null);
 
 };
 

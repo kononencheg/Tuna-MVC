@@ -72,6 +72,8 @@ tuna.ui.selection.view = {};
 tuna.ui.transformers = {};
 
 
+
+
 /**
  * @private
  * @type {number}
@@ -81,9 +83,17 @@ tuna.ui.__lastId = 0;
 
 /**
  * @private
- * @type {!Object.<string, !tuna.ui.MarkupWidgetFactory>}
+ * @type {!Object.<string, !tuna.ui.IWidgetFactory>}
  */
-tuna.ui.__typeTable = {};
+tuna.ui.__factoryTable = {};
+
+
+
+/**
+ * @private
+ * @type {!Object.<string, string>}
+ */
+tuna.ui.__selectorsTable = {};
 
 
 /**
@@ -94,37 +104,45 @@ tuna.ui.__isolators = [];
 
 
 /**
- * Регистрация фабрики создания виджетов из разметки.
+ * @type {!Node}
+ */
+tuna.ui.DUMMY_NODE = document.createElement('div');
+
+
+/**
+ * Регистрация фабрики создания виджетов.
  *
  * @see tuna.ui.Container
- * @see tuna.ui.MarkupWidgetFactory
+ * @see tuna.ui.IWidgetFactory
  * @param {string} type Тип создаваемого фабрикой виджета.
- * @param {!tuna.ui.MarkupWidgetFactory} widgetFactory Фабрика виджетов.
+ * @param {!tuna.ui.IWidgetFactory} widgetFactory Фабрика виджетов.
  */
-tuna.ui.registerFactory = function(type, widgetFactory) {
-    tuna.ui.__typeTable[type] = widgetFactory;
+tuna.ui.registerTypeFactory = function(type, widgetFactory) {
+    tuna.ui.__factoryTable[type] = widgetFactory;
 };
 
 
 /**
- * Получение фабрики по типу создаваемого ею виджета.
- *
- * @param {string} type Тип виджета.
- * @return {tuna.ui.MarkupWidgetFactory} Фабрика виджетов.
+ * @param {string} type
+ * @param {!tuna.ui.IWidget} widgetPrototype
  */
-tuna.ui.getFactory = function(type) {
-    if (tuna.ui.__typeTable[type] !== undefined) {
-        return tuna.ui.__typeTable[type];
-    }
+tuna.ui.registerTypePrototype = function(type, widgetPrototype) {
+    tuna.ui.__factoryTable[type] = new tuna.ui.WidgetFactory(widgetPrototype);
+};
 
-    return null;
+
+/**
+ * @param {string} type
+ * @param {string} selector
+ */
+tuna.ui.registerTypeSelector = function(type, selector) {
+    tuna.ui.__selectorsTable[type] = selector;
 };
 
 
 /**
  * Регистрация CSS-класса изолирующего поиск виджетов во вложенных контейнерах.
  *
- * @see tuna.ui.MarkupWidgetFactory#_isInContext
  * @param {string} className Изолирующий CSS-класс.
  */
 tuna.ui.registerIsolator = function(className) {
@@ -135,11 +153,116 @@ tuna.ui.registerIsolator = function(className) {
 
 
 /**
- * Получение всех изолирующих CSS-классов.
- *
- * @return {!Array.<string>} Массив CSS-классов.
+ * @param {string} type
+ * @param {!Node} context
+ * @param {boolean} useIsolators
+ * @return {!Array.<!Node>}
  */
-tuna.ui.getIsolators = function() {
-    return tuna.ui.__isolators;
+tuna.ui.findWidgetsTargets = function(type, context, useIsolators) {
+    var targets = [];
+
+    var selector = tuna.ui.__selectorsTable[type];
+    if (selector !== undefined) {
+
+        var applicants = tuna.ui.__findApplicants(context, selector);
+        var i = 0,
+            l = applicants.length;
+
+        while (i < l) {
+            if (tuna.ui.__isInContext(applicants[i], context, useIsolators)) {
+                targets.push(applicants[i]);
+            }
+
+            i++;
+        }
+
+        return targets;
+    }
+
+    return targets;
 };
 
+
+/**
+ * @param {string} type
+ * @param {!Array.<!Node>} targets
+ * @param {boolean} autoInit
+ * @param {tuna.ui.Container=} opt_container
+ * @return {!Array.<!tuna.ui.IWidget>}
+ */
+tuna.ui.createWidgets = function(type, targets, autoInit, opt_container) {
+    var result = [];
+
+    var factory = tuna.ui.__factoryTable[type];
+    if (factory !== undefined) {
+        var i = 0,
+            l = targets.length;
+
+        var widget = null;
+        while (i < l) {
+            widget = factory.createWidget(targets[i], opt_container);
+
+            if (widget !== null) {
+                if (autoInit) {
+                    widget.init();
+                }
+
+                result.push(widget);
+            }
+
+            i++
+        }
+    }
+
+    return result;
+};
+
+
+
+/**
+ * @private
+ * @param {!Node} context
+ * @param {string} selector
+ * @return {!Array.<!Node>}
+ */
+tuna.ui.__findApplicants = function(context, selector) {
+    var result = tuna.dom.select(selector, context);
+
+    if (tuna.dom.matchesSelector(context, selector)) {
+        result.push(context);
+    }
+
+    return result;
+};
+
+
+/**
+ * @private
+ * @param {!Node} target Целевой DOM-элемент.
+ * @param {!Node} context Контекcт поиска.
+ * @param {boolean} useIsolators
+ * @return {boolean} Результат проверки.
+ */
+tuna.ui.__isInContext = function(target, context, useIsolators) {
+    var result = true;
+
+    var i = 0,
+        l = tuna.ui.__isolators.length;
+
+    while (i < l) {
+        if (target !== context) {
+            result = result &&
+                    !(!useIsolators && tuna.dom.hasClass(target, tuna.ui.__isolators[i])) &&
+                     tuna.dom.getParentWithClass
+                         (target, tuna.ui.__isolators[i], context) === null;
+
+            if (!result) {
+                break;
+            }
+        }
+
+        i++;
+    }
+
+    return result;
+};

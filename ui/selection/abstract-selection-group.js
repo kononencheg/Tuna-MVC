@@ -1,21 +1,86 @@
 /**
  * @constructor
- * @extends tuna.ui.Widget
- * @implements tuna.ui.selection.ISelectionGroup
+ * @extends {tuna.ui.Widget}
+ * @implements {tuna.ui.selection.ISelectionGroup}
  * @param {!Node} target
+ * @param {!tuna.ui.Container=} opt_container
  */
-tuna.ui.selection.AbstractSelectionGroup = function(target) {
-    tuna.ui.Widget.call(this, target);
+tuna.ui.selection.AbstractSelectionGroup = function(target, opt_container) {
+    tuna.ui.Widget.call(this, target, opt_container);
 
+    /**
+     * @type {tuna.ui.selection.items.AbstractWidgetCollection}
+     * @protected
+     */
     this._itemsCollection = null;
 
+    /**
+     * @type {tuna.ui.selection.view.AbstractSelectionView}
+     * @protected
+     */
     this._selectionView = null;
+
+    /**
+     * @type {tuna.ui.selection.rule.AbstractSelectionRule}
+     * @protected
+     */
     this._selectionRule = null;
 };
 
 
 tuna.utils.extend
     (tuna.ui.selection.AbstractSelectionGroup, tuna.ui.Widget);
+
+
+/**
+ * @override
+ */
+tuna.ui.selection.AbstractSelectionGroup.prototype.init = function() {
+    this._itemsCollection = this._createItemsCollection();
+    this._selectionView = this._createSelectionView();
+    this._selectionRule = this._createSelectionRule();
+
+    if (this._selectionRule !== null &&
+        this._itemsCollection !== null &&
+        this._selectionView !== null) {
+
+        this._itemsCollection.setSelectionGroup(this);
+
+        this._selectionView.setSelectionRule(this._selectionRule);
+        this._selectionView.setItemsCollection(this._itemsCollection);
+
+        this._selectionRule.setEventDispatcher(this);
+        this._selectionRule.setItemsCollection(this._itemsCollection);
+        this._selectionRule.setSelectionView(this._selectionView);
+
+        this._selectionView.update();
+    }
+};
+
+
+/**
+ * @return {tuna.ui.selection.view.AbstractSelectionView}
+ * @protected
+ */
+tuna.ui.selection.AbstractSelectionGroup.prototype._createSelectionView =
+    function() {};
+
+
+/**
+ * @return {tuna.ui.selection.items.AbstractWidgetCollection}
+ * @protected
+ */
+tuna.ui.selection.AbstractSelectionGroup.prototype._createItemsCollection =
+    function() {};
+
+
+/**
+ * @return {tuna.ui.selection.rule.AbstractSelectionRule}
+ * @protected
+ */
+tuna.ui.selection.AbstractSelectionGroup.prototype._createSelectionRule =
+    function() {};
+
 
 /**
  * @override
@@ -118,3 +183,18 @@ tuna.ui.selection.AbstractSelectionGroup.prototype.clearSelection
 
     this._selectionRule.clearSelection();
 };
+
+
+/**
+ * @param {!tuna.ui.IWidget} widget
+ * @param {string|number} index
+ */
+tuna.ui.selection.AbstractSelectionGroup.prototype.handleCreatedItem =
+    function(widget, index) {};
+
+/**
+ * @param {!tuna.ui.IWidget} widget
+ * @param {string|number} index
+ */
+tuna.ui.selection.AbstractSelectionGroup.prototype.handleRemovedItem =
+    function(widget, index) {};
