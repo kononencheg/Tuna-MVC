@@ -48,7 +48,7 @@ tuna.ui.selection = {};
  * Область имен классов-наборов элементов в списках выделения.
  * @namespace
  */
-tuna.ui.selection.items = {};
+tuna.ui.selection.collection = {};
 
 
 /**

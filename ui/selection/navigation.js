@@ -3,12 +3,19 @@
 
 /**
  * @constructor
- * @extends {tuna.ui.selection.AbstractSelectionGroup}
+ * @extends {tuna.ui.selection.WidgetGroup}
  * @param {!Node} target
  * @param {!tuna.ui.Container=} opt_container  контейнер.
  */
 tuna.ui.selection.Navigation = function(target, opt_container) {
     tuna.ui.selection.WidgetGroup.call(this, target, opt_container);
+
+    /**
+     *
+     * @type {tuna.ui.selection.NavigationPage}
+     * @private
+     */
+    this.__currentPage = null;
 };
 
 
@@ -18,48 +25,8 @@ tuna.utils.extend(tuna.ui.selection.Navigation, tuna.ui.selection.WidgetGroup);
 /**
  * @inheritDoc
  */
-tuna.ui.selection.Navigation.prototype.init = function() {
-    tuna.ui.selection.WidgetGroup.prototype.init.call(this);
-
-    var self = this;
-
-    this.addEventListener('select', function(event, newIndex) {
-        var page = self._itemsCollection.getItemAt(newIndex);
-        if (page !== null) {
-            page.dispatch('open');
-        }
-    });
-
-    this.addEventListener('deselect', function(event, oldIndex) {
-        var page = self._itemsCollection.getItemAt(oldIndex);
-        if (page !== null) {
-            if (!page.dispatch('close')) {
-                event.preventDefault();
-            }
-        }
-    });
-
-    this.addEventListener('selected', function(event, newIndex) {
-        var page = self._itemsCollection.getItemAt(newIndex);
-        if (page !== null) {
-            page.dispatch('opened');
-        }
-    });
-
-    this.addEventListener('deselected', function(event, oldIndex) {
-        var page = self._itemsCollection.getItemAt(oldIndex);
-        if (page !== null) {
-            page.dispatch('closed');
-        }
-    });
-};
-
-
-/**
- * @inheritDoc
- */
-tuna.ui.selection.Navigation.prototype._createItemsCollection = function() {
-    return new tuna.ui.selection.items.NamedCollection();
+tuna.ui.selection.Navigation.prototype._createCollection = function() {
+    return new tuna.ui.selection.collection.NamedCollection(this);
 };
 
 
@@ -67,14 +34,14 @@ tuna.ui.selection.Navigation.prototype._createItemsCollection = function() {
  * @inheritDoc
  */
 tuna.ui.selection.Navigation.prototype._createSelectionRule = function() {
-    return new tuna.ui.selection.rule.SingleSelectionRule();
+    return new tuna.ui.selection.rule.SingleSelectionRule(this._selectionState);
 };
 
 
 /**
  * @inheritDoc
  */
-tuna.ui.selection.Navigation.prototype.handleCreatedItem =
+tuna.ui.selection.Navigation.prototype.handleCreatedWidget =
     function(widget, index) {
 
     if (widget instanceof tuna.ui.selection.NavigationPage) {
@@ -82,4 +49,20 @@ tuna.ui.selection.Navigation.prototype.handleCreatedItem =
     }
 
     widget.init();
+};
+
+
+/**
+ * @param {string} index
+ */
+tuna.ui.selection.Navigation.prototype.navigate = function(index) {
+    if (this._selectionState.isEnabled(index) &&
+       !this._selectionState.isSelected(index)) {
+
+        /*if (this.__currentPage !== null) {
+            this.__currentPage.dispatch()
+        }*/
+
+        this._selectionRule.selectIndex(index);
+    }
 };

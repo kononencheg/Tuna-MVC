@@ -63,6 +63,8 @@ tuna.ui.selection.NavigationPage.prototype.select = function() {
 
         this._isInitialized = true;
     }
+
+    this.dispatch('opened');
 };
 
 
@@ -71,6 +73,7 @@ tuna.ui.selection.NavigationPage.prototype.select = function() {
  */
 tuna.ui.selection.NavigationPage.prototype.deselect = function() {
     tuna.ui.Container.prototype.deselect.call(this);
+    this.dispatch('closed');
 };
 
 

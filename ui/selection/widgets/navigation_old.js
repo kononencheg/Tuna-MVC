@@ -65,7 +65,7 @@ tuna.ui.selection.Navigation.prototype.__initNavigation = function() {
     this.__navigationRule
         = new tuna.ui.selection.rule.SingleSelectionRule();
 
-    var pagesCollection = new tuna.ui.selection.items.NamedCollection();
+    var pagesCollection = new tuna.ui.selection.collection.NamedCollection();
 
     var selectionView
         = new tuna.ui.selection.view.ClassSelectionView(this._target);
