@@ -26,11 +26,12 @@ tuna.utils.extend(tuna.control.PageController, tuna.control.Controller);
 
 
 /**
- * @param {tuna.ui.selection.Navigation} navigation
+ * @param {!tuna.ui.selection.Navigation} navigation
  */
 tuna.control.PageController.prototype.setNavigation = function(navigation) {
     this._navigation = navigation;
 };
+
 
 /**
  * Проверка возможности "закрытия" соответсующей контроллеру страницы
@@ -68,7 +69,6 @@ tuna.control.PageController.prototype.close = function() {};
  * Реализация обработки открытия и обработка сопутствующих данных
  * переопределяется в наследниках класса.
  *
- * @param {Object.<string, string>} args Данные сопуствующие открытию.
+ * @param {Object.<string, string>} data Данные сопуствующие открытию.
  */
-tuna.control.PageController.prototype.open = function(args) {};
-
+tuna.control.PageController.prototype.open = function(data) {};

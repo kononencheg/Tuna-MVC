@@ -70,7 +70,7 @@ tuna.ui.selection.view.WidgetSelectionView.prototype.update = function() {
     this._itemsCollection.clear();
 
     var targets =
-        tuna.ui.findWidgetsTargets(this._widgetType, this._target, true);
+        tuna.ui.findWidgetsTargets(this._widgetType, this._target, false, true);
 
     var widgets = tuna.ui.createWidgets
         (this._widgetType, targets, false, this._container);

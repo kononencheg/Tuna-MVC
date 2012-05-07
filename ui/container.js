@@ -20,16 +20,16 @@ tuna.ui.Container = function(target, opt_container) {
     tuna.ui.Widget.call(this, target, opt_container);
 
     /**
-     * @type {!Array.<string>}
-     * @private
-     */
-    this.__widgetTypes = [];
-
-    /**
      * @type {!Object.<string, !Object.<string, !Array.<!tuna.ui.Widget>>>}
      * @private
      */
     this.__idWidgets = {};
+
+    /**
+     * @type {tuna.control.Controller}
+     * @protected
+     */
+    this._controller = null;
 };
 
 
@@ -40,10 +40,19 @@ tuna.utils.extend(tuna.ui.Container, tuna.ui.Widget);
  * @inheritDoc
  */
 tuna.ui.Container.prototype.init = function() {
-    this.__widgetTypes = this.getArrayOption('widgets');
+    var controllerId = this.getStringOption('controller-id');
+    if (controllerId !== null) {
+        this._controller = tuna.control.getController(controllerId);
+    } else if (this._target === document.body) {
+        this._controller = tuna.control.getApplicationController();
+    }
 
     this.initWidgets(this._target);
-    this.dispatch('init');
+
+    if (this._controller !== null) {
+        this._controller.setContainer(this);
+        this._controller.initActions();
+    }
 };
 
 
@@ -51,7 +60,9 @@ tuna.ui.Container.prototype.init = function() {
  * @inheritDoc
  */
 tuna.ui.Container.prototype.destroy = function() {
-    this.dispatch('destroy');
+    if (this._controller !== null) {
+        this._controller.destroyActions();
+    }
 
     for (var id in this.__idWidgets) {
         var typeWidgets = this.__idWidgets[id];
@@ -78,8 +89,25 @@ tuna.ui.Container.prototype.destroy = function() {
  *
  * @param {!Node} target DOM-элемент в котором требуется проинициализировать
  *        виджеты.
+ * @param {!Array.<string>=} opt_types
  */
-tuna.ui.Container.prototype.initWidgets = function(target) {
+tuna.ui.Container.prototype.initWidgets = function(target, opt_types) {
+    var types = opt_types || this.getArrayOption('widgets');
+
+    var i = types.length - 1;
+    while (i >= 0) {
+        this.initWidgetsByType(target, types[i]);
+
+        i--;
+    }
+};
+
+
+/**
+ * @param {!Node} target
+ * @param {string} type
+ */
+tuna.ui.Container.prototype.initWidgetsByType = function(target, type) {
     if (target.id === null) {
         target.id = 'container_' + tuna.ui.__lastId++;
     }
@@ -89,32 +117,38 @@ tuna.ui.Container.prototype.initWidgets = function(target) {
         this.__idWidgets[id] = {};
     }
 
-    var i = 0,
-        l = this.__widgetTypes.length;
+    var targets = tuna.ui.findWidgetsTargets(type, target, true, false);
 
-    var type = null;
-    var targets = null;
-    while (i < l) {
-        type = this.__widgetTypes[i];
-        targets = tuna.ui.findWidgetsTargets(type, target, false);
+    this.__idWidgets[id][type] =
+        tuna.ui.createWidgets(type, targets, true, this);
+};
 
-        this.__idWidgets[id][type] =
-            tuna.ui.createWidgets(type, targets, true, this);
-        
-        i++;
+
+/**
+ * @param {!Node} target
+ * @param {!Array.<string>=} opt_types
+ */
+tuna.ui.Container.prototype.destroyWidgets = function(target, opt_types) {
+    var types = opt_types || this.getArrayOption('widgets');
+    var i = types.length - 1;
+    while (i >= 0) {
+        this.destroyWidgetsByType(target, types[i]);
+
+        i--;
     }
 };
 
 
 /**
- * @param {!Node} target 
+ * @param {!Node} target
+ * @param {string} type
  */
-tuna.ui.Container.prototype.destroyWidgets = function(target) {
+tuna.ui.Container.prototype.destroyWidgetsByType = function(target, type) {
     var id = target.id;
     if (id !== null && this.__idWidgets[id] !== undefined) {
         var typeWidgets = this.__idWidgets[id];
 
-        for (var type in typeWidgets) {
+        if (typeWidgets[type] !== undefined) {
             while (typeWidgets[type].length) {
                 typeWidgets[type].shift().destroy();
             }
@@ -125,7 +159,7 @@ tuna.ui.Container.prototype.destroyWidgets = function(target) {
 };
 
 
-/**
+    /**
  * Получение виждета по типу и имени.
  *
  * @see tuna.ui.Widget#getName

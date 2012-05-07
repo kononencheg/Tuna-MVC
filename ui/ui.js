@@ -155,16 +155,19 @@ tuna.ui.registerIsolator = function(className) {
 /**
  * @param {string} type
  * @param {!Node} context
+ * @param {boolean} useContext
  * @param {boolean} useIsolators
  * @return {!Array.<!Node>}
  */
-tuna.ui.findWidgetsTargets = function(type, context, useIsolators) {
+tuna.ui.findWidgetsTargets = function(type, context, useContext, useIsolators) {
     var targets = [];
 
     var selector = tuna.ui.__selectorsTable[type];
     if (selector !== undefined) {
 
-        var applicants = tuna.ui.__findApplicants(context, selector);
+        var applicants =
+            tuna.ui.__findApplicants(context, selector, useContext);
+
         var i = 0,
             l = applicants.length;
 
@@ -223,12 +226,13 @@ tuna.ui.createWidgets = function(type, targets, autoInit, opt_container) {
  * @private
  * @param {!Node} context
  * @param {string} selector
+ * @param {boolean} useContext
  * @return {!Array.<!Node>}
  */
-tuna.ui.__findApplicants = function(context, selector) {
+tuna.ui.__findApplicants = function(context, selector, useContext) {
     var result = tuna.dom.select(selector, context);
 
-    if (tuna.dom.matchesSelector(context, selector)) {
+    if (useContext && tuna.dom.matchesSelector(context, selector)) {
         result.push(context);
     }
 

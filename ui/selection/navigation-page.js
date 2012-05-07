@@ -30,10 +30,18 @@ tuna.utils.extend(tuna.ui.selection.NavigationPage, tuna.ui.Container);
 /**
  * @param {!tuna.ui.selection.Navigation} navigation
  */
-tuna.ui.selection.NavigationPage.prototype.setNavigation =
-    function(navigation) {
+tuna.ui.selection.NavigationPage.prototype
+    .setNavigation = function(navigation) {
 
     this._navigation = navigation;
+};
+
+
+/**
+ * @return {tuna.ui.selection.Navigation}
+ */
+tuna.ui.selection.NavigationPage.prototype.getNavigation = function() {
+    return this._navigation;
 };
 
 
@@ -41,39 +49,44 @@ tuna.ui.selection.NavigationPage.prototype.setNavigation =
  * @inheritDoc
  */
 tuna.ui.selection.NavigationPage.prototype.init = function() {
-    var controllerId = this.getStringOption('controller-id');
-    if (controllerId !== null) {
-
-        var controller  = tuna.control.getController(controllerId);
-        if (controller instanceof tuna.control.PageController) {
-            controller.setNavigation(this._navigation);
-            controller.setContainer(this);
-        }
+    if (this.isSelected()) {
+        this.open();
     }
 };
 
-/**
- * @inheritDoc
- */
-tuna.ui.selection.NavigationPage.prototype.select = function() {
-    tuna.ui.Container.prototype.select.call(this);
 
+/**
+ * @param {string} index
+ */
+tuna.ui.selection.NavigationPage.prototype.canClose = function(index) {
+    if (this._controller instanceof tuna.control.PageController) {
+        if (this._controller.canClose(index)) {
+            this._controller.close();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    return true;
+};
+
+
+/**
+ * @param {Object.<string, string>=} opt_data Данные сопуствующие открытию.
+ */
+tuna.ui.selection.NavigationPage.prototype.open = function(opt_data) {
     if (!this._isInitialized) {
         tuna.ui.Container.prototype.init.call(this);
 
         this._isInitialized = true;
     }
 
-    this.dispatch('opened');
-};
+    if (this._controller instanceof tuna.control.PageController) {
+        this._controller.open(opt_data || null);
+    }
 
-
-/**
- * @inheritDoc
- */
-tuna.ui.selection.NavigationPage.prototype.deselect = function() {
-    tuna.ui.Container.prototype.deselect.call(this);
-    this.dispatch('closed');
 };
 
 

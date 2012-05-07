@@ -20,18 +20,6 @@ tuna.control.Controller = function() {
      * @type {tuna.ui.Container}
      */
     this._container = null;
-
-    /**
-     * @type {function()}
-     * @private
-     */
-    this._initActions = tuna.utils.bind(this.initActions, this);
-
-    /**
-     * @type {function()}
-     * @private
-     */
-    this.__destroyActions = tuna.utils.bind(this.destroyActions, this);
 };
 
 
@@ -46,15 +34,7 @@ tuna.control.Controller = function() {
  * @param {!tuna.ui.Container} container Контейнер упраления виджетами.
  */
 tuna.control.Controller.prototype.setContainer = function(container) {
-    if (this._container !== null) {
-        this._container.removeEventListener('init', this._initActions);
-        this._container.removeEventListener('destroy', this.__destroyActions);
-    }
-
     this._container = container;
-
-    this._container.addEventListener('init', this._initActions);
-    this._container.addEventListener('destroy', this.__destroyActions);
 };
 
 

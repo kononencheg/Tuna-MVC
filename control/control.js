@@ -73,6 +73,14 @@ tuna.control.getController = function(id) {
 
 
 /**
+ * @return {tuna.control.Controller}
+ */
+tuna.control.getApplicationController = function() {
+    return tuna.control.__applicationController;
+};
+
+
+/**
  * Инициализация основного контроллера.
  *
  * @see tuna.control.setApplicationController
@@ -81,10 +89,5 @@ tuna.control.getController = function(id) {
  */
 tuna.control.init = function(target) {
     var container = new tuna.ui.Container(target);
-
-    if (tuna.control.__applicationController !== null) {
-        tuna.control.__applicationController.setContainer(container);
-    }
-
     container.init();
 };
