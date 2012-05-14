@@ -3,7 +3,7 @@
  * @extends tuna.ui.Widget
  * @implements tuna.ui.transformers.ITransformer
  * @param {!Node} target
- * @param {!tuna.ui.Container=} opt_container
+ * @param {tuna.ui.Container=} opt_container
  */
 tuna.ui.transformers.TemplateTransformer = function (target, opt_container) {
     tuna.ui.Widget.call(this, target, opt_container);

@@ -22,12 +22,12 @@ tuna.ui.selection.SelectionState = function() {
      * @type {!Object.<string|number, boolean>}
      * @private
      */
-    this.__enabledIndexes = {};
+    this.__disabledIndexes = {};
 };
 
 
 /**
- * @param {!tuna.ui.selection.view.ISelectionView} view
+ * @param {tuna.ui.selection.view.ISelectionView} view
  */
 tuna.ui.selection.SelectionState.prototype.setSelectionView = function(view) {
     this.__selectionView = view;
@@ -65,10 +65,10 @@ tuna.ui.selection.SelectionState.prototype
 
     if (isSelected) {
         this.__selectedIndexes[index] = true;
-        this.__selectionView.applySelectionAt(index);
+        this.__selectionView && this.__selectionView.applySelectionAt(index);
     } else {
         delete this.__selectedIndexes[index];
-        this.__selectionView.destroySelectionAt(index);
+        this.__selectionView && this.__selectionView.destroySelectionAt(index);
     }
 };
 
@@ -85,7 +85,7 @@ tuna.ui.selection.SelectionState.prototype.isSelected  = function(index) {
 
 tuna.ui.selection.SelectionState.prototype.clearSelection  = function() {
     for (var index in this.__selectedIndexes) {
-        this.__selectionView.destroySelectionAt(index);
+        this.__selectionView && this.__selectionView.destroySelectionAt(index);
         delete this.__selectedIndexes[index];
     }
 };
@@ -99,11 +99,11 @@ tuna.ui.selection.SelectionState.prototype
     .setIndexEnabled = function(index, isEnabled) {
 
     if (isEnabled) {
-        this.__enabledIndexes[index] = true;
-        this.__selectionView.enableItemAt(index);
+        delete this.__disabledIndexes[index];
+        this.__selectionView && this.__selectionView.enableItemAt(index);
     } else {
-        delete this.__enabledIndexes[index];
-        this.__selectionView.disableItemAt(index);
+        this.__disabledIndexes[index] = true;
+        this.__selectionView && this.__selectionView.disableItemAt(index);
     }
 };
 
@@ -113,5 +113,5 @@ tuna.ui.selection.SelectionState.prototype
  * @return {boolean}
  */
 tuna.ui.selection.SelectionState.prototype.isEnabled = function(index) {
-    return this.__enabledIndexes[index] === true;
+    return this.__disabledIndexes[index] !== true;
 };

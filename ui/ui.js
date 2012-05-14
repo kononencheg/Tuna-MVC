@@ -30,6 +30,13 @@ tuna.ui.forms = {};
 
 
 /**
+ * Область имен компонентов связанных с навигацией.
+ * @namespace
+ */
+tuna.ui.nav = {};
+
+
+/**
  * Область имен компонентов связанных с всплывающими окнами.
  * @namespace
  */
@@ -124,10 +131,19 @@ tuna.ui.registerTypeFactory = function(type, widgetFactory) {
 
 /**
  * @param {string} type
- * @param {!tuna.ui.IWidget} widgetPrototype
+ * @param {!tuna.ui.Widget} widgetPrototype
  */
 tuna.ui.registerTypePrototype = function(type, widgetPrototype) {
     tuna.ui.__factoryTable[type] = new tuna.ui.WidgetFactory(widgetPrototype);
+};
+
+
+/**
+ * @param {string} type
+ * @return {tuna.ui.IWidgetFactory}
+ */
+tuna.ui.getFactory = function(type) {
+    return tuna.ui.__factoryTable[type] || null;
 };
 
 
@@ -137,6 +153,15 @@ tuna.ui.registerTypePrototype = function(type, widgetPrototype) {
  */
 tuna.ui.registerTypeSelector = function(type, selector) {
     tuna.ui.__selectorsTable[type] = selector;
+};
+
+
+/**
+ * @param {string} type
+ * @return {?string}
+ */
+tuna.ui.getSelector = function(type) {
+    return tuna.ui.__selectorsTable[type] || null;
 };
 
 
@@ -153,71 +178,29 @@ tuna.ui.registerIsolator = function(className) {
 
 
 /**
- * @param {string} type
+ * @param {string} selector
  * @param {!Node} context
  * @param {boolean} useContext
  * @param {boolean} useIsolators
  * @return {!Array.<!Node>}
  */
-tuna.ui.findWidgetsTargets = function(type, context, useContext, useIsolators) {
+tuna.ui.findTargets = function(selector, context, useContext, useIsolators) {
     var targets = [];
 
-    var selector = tuna.ui.__selectorsTable[type];
-    if (selector !== undefined) {
+    var applicants = tuna.ui.__findApplicants(context, selector, useContext);
 
-        var applicants =
-            tuna.ui.__findApplicants(context, selector, useContext);
+    var i = 0,
+        l = applicants.length;
 
-        var i = 0,
-            l = applicants.length;
-
-        while (i < l) {
-            if (tuna.ui.__isInContext(applicants[i], context, useIsolators)) {
-                targets.push(applicants[i]);
-            }
-
-            i++;
+    while (i < l) {
+        if (tuna.ui.__isInContext(applicants[i], context, useIsolators)) {
+            targets.push(applicants[i]);
         }
 
-        return targets;
+        i++;
     }
 
     return targets;
-};
-
-
-/**
- * @param {string} type
- * @param {!Array.<!Node>} targets
- * @param {boolean} autoInit
- * @param {tuna.ui.Container=} opt_container
- * @return {!Array.<!tuna.ui.IWidget>}
- */
-tuna.ui.createWidgets = function(type, targets, autoInit, opt_container) {
-    var result = [];
-
-    var factory = tuna.ui.__factoryTable[type];
-    if (factory !== undefined) {
-        var i = 0,
-            l = targets.length;
-
-        var widget = null;
-        while (i < l) {
-            widget = factory.createWidget(targets[i], opt_container);
-
-            if (widget !== null) {
-                if (autoInit) {
-                    widget.init();
-                }
-
-                result.push(widget);
-            }
-
-            i++
-        }
-    }
-
-    return result;
 };
 
 

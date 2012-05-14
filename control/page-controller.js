@@ -4,7 +4,7 @@
 /**
  * Класс управления страницей отображения. Страница отображения представляет
  * собой DOM-элемент, являющийся элементом выделения модуля управлением
- * навигацией {@link tuna.ui.selection.Navigation}.
+ * навигацией {@link tuna.ui.nav.Navigation}.
  *
  * В данном классе к базовой логике работы класса управления отображением
  * добавлена логика обработки "открытия" и "закрытия" станицы отображения.
@@ -17,7 +17,7 @@ tuna.control.PageController = function() {
 
     /**
      * @protected
-     * @type {tuna.ui.selection.Navigation}
+     * @type {tuna.ui.nav.Navigation}
      */
     this._navigation = null;
 };
@@ -26,7 +26,7 @@ tuna.utils.extend(tuna.control.PageController, tuna.control.Controller);
 
 
 /**
- * @param {!tuna.ui.selection.Navigation} navigation
+ * @param {!tuna.ui.nav.Navigation} navigation
  */
 tuna.control.PageController.prototype.setNavigation = function(navigation) {
     this._navigation = navigation;

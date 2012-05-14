@@ -4,12 +4,12 @@
 /**
  * @implements {tuna.ui.IWidgetFactory}
  * @constructor
- * @param {!tuna.ui.IWidget} widgetPrototype
+ * @param {!tuna.ui.Widget} widgetPrototype
  */
 tuna.ui.WidgetFactory = function(widgetPrototype) {
 
     /**
-     * @type {!tuna.ui.IWidget}
+     * @type {!tuna.ui.Widget}
      * @private
      */
     this.__widgetPrototype = widgetPrototype;

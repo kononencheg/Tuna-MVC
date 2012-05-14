@@ -2,25 +2,21 @@
 
 
 /**
+ * @implements {tuna.ui.selection.view.ISelectionView}
  * @constructor
- * @extends {tuna.ui.selection.view.SelectionView}
  * @param {!Node} target
- * @param {string} widgetType
+ * @param {string} itemSelector
+ * @param {!tuna.ui.IWidgetFactory} widgetFactory
+ * @param {!tuna.ui.selection.SelectionState} selectionState
+ * @param {!tuna.ui.selection.collection.WidgetCollection} itemCollection
+ * @param {tuna.ui.Container=} opt_container
  */
-tuna.ui.selection.view.WidgetSelectionView = function(target, widgetType) {
-    tuna.ui.selection.view.SelectionView.call(this);
-
-    /**
-     * @protected
-     * @type {tuna.ui.selection.collection.WidgetCollection}
-     */
-    this._itemsCollection = null;
-
-    /**
-     * @type {tuna.ui.Container}
-     * @protected
-     */
-    this._container = null;
+tuna.ui.selection.view.WidgetSelectionView = function(target,
+                                                      itemSelector,
+                                                      widgetFactory,
+                                                      selectionState,
+                                                      itemCollection,
+                                                      opt_container) {
 
     /**
      * @type {!Node}
@@ -32,75 +28,75 @@ tuna.ui.selection.view.WidgetSelectionView = function(target, widgetType) {
      * @type {string}
      * @protected
      */
-    this._widgetType = widgetType;
-};
+    this._itemSelector = itemSelector;
 
+    /**
+     * @protected
+     * @type {!tuna.ui.selection.SelectionState}
+     */
+    this._selectionState = selectionState;
 
-tuna.utils.extend(
-    tuna.ui.selection.view.WidgetSelectionView,
-    tuna.ui.selection.view.SelectionView
-);
+    /**
+     * @type {!tuna.ui.IWidgetFactory}
+     * @protected
+     */
+    this._widgetFactory = widgetFactory;
 
+    /**
+     * @protected
+     * @type {!tuna.ui.selection.collection.WidgetCollection}
+     */
+    this._itemsCollection = itemCollection;
 
-/**
- * @param {tuna.ui.selection.collection.WidgetCollection} collection
- */
-tuna.ui.selection.view.WidgetSelectionView.prototype
-    .setItemsCollection = function(collection) {
-
-    this._itemsCollection = collection;
-};
-
-
-/**
- * @param {!tuna.ui.Container} container
- */
-tuna.ui.selection.view.WidgetSelectionView.prototype
-    .setContainer = function(container) {
-
-    this._container = container;
+    /**
+     * @type {tuna.ui.Container}
+     * @protected
+     */
+    this._container = opt_container || null;
 };
 
 
 /**
- * @override
+ * @inheritDoc
  */
 tuna.ui.selection.view.WidgetSelectionView.prototype.update = function() {
-    this._selectionState.clearSelection();
-    this._itemsCollection.clear();
+    var self = this;
 
-    var targets =
-        tuna.ui.findWidgetsTargets(this._widgetType, this._target, false, true);
+    var targets = tuna.ui.findTargets
+        (this._itemSelector, this._target, false, true);
 
-    var widgets = tuna.ui.createWidgets
-        (this._widgetType, targets, false, this._container);
+    this._itemsCollection.mapItems(function(index, widget) {
+        var target = widget.getTarget();
 
-    var i = 0,
-        l = widgets.length;
-
-    var index = null;
-    var widget = null;
-    while (i < l) {
-        widget = widgets[i];
-        index = this._itemsCollection.addItem(widget);
-
-        if (index !== null) {
-            if (widget.isSelected()) {
-                this._selectionState.setIndexSelected(index, true);
-            }
-
-            if (widget.isEnabled()) {
-                this._selectionState.setIndexEnabled(index, true);
-            }
+        var targetIndex = tuna.utils.indexOf(target, targets);
+        if (targetIndex === -1) {
+            self._itemsCollection.removeItemAt(index);
+        } else {
+            targets.splice(targetIndex, 1);
         }
+    });
 
-        i++;
+    var widget = null;
+    var index = null;
+    while (targets.length > 0) {
+        widget = this._widgetFactory.createWidget
+                        (targets.shift(), this._container);
+
+        index = this._itemsCollection.addItem(widget);
+        if (index !== null) {
+            this._selectionState.setIndexSelected
+                (index, widget.isSelected());
+
+            this._selectionState.setIndexEnabled
+                (index, widget.isEnabled());
+        }
     }
+
 };
 
 
 /**
- * @override
+ * @inheritDoc
  */
 tuna.ui.selection.view.WidgetSelectionView.prototype
     .applySelectionAt = function(index) {
@@ -113,7 +109,7 @@ tuna.ui.selection.view.WidgetSelectionView.prototype
 
 
 /**
- * @override
+ * @inheritDoc
  */
 tuna.ui.selection.view.WidgetSelectionView.prototype
     .destroySelectionAt = function(index) {
@@ -126,7 +122,7 @@ tuna.ui.selection.view.WidgetSelectionView.prototype
 
 
 /**
- * @override
+ * @inheritDoc
  */
 tuna.ui.selection.view.WidgetSelectionView.prototype
     .disableItemAt = function(index) {
@@ -139,7 +135,7 @@ tuna.ui.selection.view.WidgetSelectionView.prototype
 
 
 /**
- * @override
+ * @inheritDoc
  */
 tuna.ui.selection.view.WidgetSelectionView.prototype
     .enableItemAt = function(index) {

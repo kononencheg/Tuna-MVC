@@ -6,7 +6,6 @@
  *
  * @see tuna.ui.Container
  * @constructor
- * @implements {tuna.ui.IWidget}
  * @extends {tuna.events.EventDispatcher}
  * @param {!Node} target Целевой DOM-элемент.
  * @param {tuna.ui.Container=} opt_container Контейнер, к которому
@@ -43,9 +42,10 @@ tuna.ui.Widget = function(target, opt_container) {
 
 tuna.utils.extend(tuna.ui.Widget, tuna.events.EventDispatcher);
 
-
 /**
- * @inheritDoc
+ * Получение целевого DOM-элемента виджета.
+ *
+ * @return {!Node} Целевой DOM-элемент.
  */
 tuna.ui.Widget.prototype.getTarget = function() {
     return this._target;
@@ -61,7 +61,12 @@ tuna.ui.Widget.prototype.getContainer = function() {
 
 
 /**
- * @inheritDoc
+ * Получение имени виджета.
+ *
+ * Имя виджета устанавливается в аттрибуте целевого DOM-элемента
+ * <code>data-name</code>.
+ *
+ * @return {?string} Имя экземпляра.
  */
 tuna.ui.Widget.prototype.getName = function() {
     return this._target.getAttribute('data-name');
@@ -69,19 +74,21 @@ tuna.ui.Widget.prototype.getName = function() {
 
 
 /**
- * @inheritDoc
+ * Инициализация виджета.
  */
 tuna.ui.Widget.prototype.init = function() {};
 
 
 /**
- * @inheritDoc
+ * Уничтожение виджета.
  */
-tuna.ui.Widget.prototype.destroy = function() {};
+tuna.ui.Widget.prototype.destroy = function() {
+    this._container = null;
+};
 
 
 /**
- * @inheritDoc
+ * Отключение работоспособности виджета.
  */
 tuna.ui.Widget.prototype.disable = function() {
     tuna.dom.addClass(this._target, 'disabled');
@@ -89,7 +96,7 @@ tuna.ui.Widget.prototype.disable = function() {
 
 
 /**
- * @inheritDoc
+ * Включение работоспособности виджета.
  */
 tuna.ui.Widget.prototype.enable = function() {
     tuna.dom.removeClass(this._target, 'disabled');
@@ -97,31 +104,29 @@ tuna.ui.Widget.prototype.enable = function() {
 
 
 /**
- * @inheritDoc
+ * Проверка работоспособности виджета.
+ *
+ * @return {boolean} Результат проверки.
  */
 tuna.ui.Widget.prototype.isEnabled = function() {
     return !tuna.dom.hasClass(this._target, 'disabled');
 };
 
 
-/**
- * @inheritDoc
- */
+
 tuna.ui.Widget.prototype.select = function() {
     tuna.dom.addClass(this._target, 'active');
 };
 
 
-/**
- * @inheritDoc
- */
+
 tuna.ui.Widget.prototype.deselect = function() {
     tuna.dom.removeClass(this._target, 'active');
 };
 
 
 /**
- * @inheritDoc
+ * @return {boolean} Результат проверки.
  */
 tuna.ui.Widget.prototype.isSelected = function() {
     return tuna.dom.hasClass(this._target, 'active');
@@ -129,11 +134,14 @@ tuna.ui.Widget.prototype.isSelected = function() {
 
 
 /**
- * @inheritDoc
+ * @param {!Node} target
+ * @param {tuna.ui.Container=} opt_container
+ * @return {!tuna.ui.Widget}
  */
 tuna.ui.Widget.prototype.clone = function(target, opt_container) {
     return new this.constructor(target, opt_container);
 };
+
 
 /**
  * Устанока параметра настроек виджета по умолчанию.

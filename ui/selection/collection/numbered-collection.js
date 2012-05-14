@@ -11,7 +11,7 @@ tuna.ui.selection.collection.NumberedCollection = function(widgetGroup) {
 
     /**
      * @private
-     * @type {!Array.<!tuna.ui.IWidget>}
+     * @type {!Array.<!tuna.ui.Widget>}
      */
     this.__widgets = [];
 };
@@ -36,6 +36,18 @@ tuna.ui.selection.collection.NumberedCollection.prototype
     return index;
 };
 
+
+/**
+ * @override
+ */
+tuna.ui.selection.collection.NumberedCollection.prototype
+    .removeItemAt = function(index) {
+
+    if (this.__widgets[index] !== undefined) {
+        this._widgetGroup.handleRemovedWidget(this.__widgets[index], index);
+        this.__widgets.splice(index, 1);
+    }
+};
 
 /**
  * @override

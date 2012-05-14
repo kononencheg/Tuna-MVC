@@ -5,13 +5,13 @@
  * @constructor
  * @extends {tuna.ui.Container}
  * @param {!Node} target
- * @param {!tuna.ui.Container=} opt_container
+ * @param {tuna.ui.Container=} opt_container
  */
-tuna.ui.selection.NavigationPage = function(target, opt_container) {
+tuna.ui.nav.NavigationPage = function(target, opt_container) {
     tuna.ui.Container.call(this, target, opt_container);
 
     /**
-     * @type {tuna.ui.selection.Navigation}
+     * @type {tuna.ui.nav.Navigation}
      * @protected
      */
     this._navigation = null;
@@ -24,41 +24,29 @@ tuna.ui.selection.NavigationPage = function(target, opt_container) {
 };
 
 
-tuna.utils.extend(tuna.ui.selection.NavigationPage, tuna.ui.Container);
+tuna.utils.extend(tuna.ui.nav.NavigationPage, tuna.ui.Container);
 
 
 /**
- * @param {!tuna.ui.selection.Navigation} navigation
+ * @param {!tuna.ui.nav.Navigation} navigation
  */
-tuna.ui.selection.NavigationPage.prototype
-    .setNavigation = function(navigation) {
-
+tuna.ui.nav.NavigationPage.prototype.setNavigation = function(navigation) {
     this._navigation = navigation;
 };
 
 
 /**
- * @return {tuna.ui.selection.Navigation}
+ * @return {tuna.ui.nav.Navigation}
  */
-tuna.ui.selection.NavigationPage.prototype.getNavigation = function() {
+tuna.ui.nav.NavigationPage.prototype.getNavigation = function() {
     return this._navigation;
-};
-
-
-/**
- * @inheritDoc
- */
-tuna.ui.selection.NavigationPage.prototype.init = function() {
-    if (this.isSelected()) {
-        this.open();
-    }
 };
 
 
 /**
  * @param {string} index
  */
-tuna.ui.selection.NavigationPage.prototype.canClose = function(index) {
+tuna.ui.nav.NavigationPage.prototype.canClose = function(index) {
     if (this._controller instanceof tuna.control.PageController) {
         if (this._controller.canClose(index)) {
             this._controller.close();
@@ -76,7 +64,7 @@ tuna.ui.selection.NavigationPage.prototype.canClose = function(index) {
 /**
  * @param {Object.<string, string>=} opt_data Данные сопуствующие открытию.
  */
-tuna.ui.selection.NavigationPage.prototype.open = function(opt_data) {
+tuna.ui.nav.NavigationPage.prototype.open = function(opt_data) {
     if (!this._isInitialized) {
         tuna.ui.Container.prototype.init.call(this);
 
@@ -93,7 +81,7 @@ tuna.ui.selection.NavigationPage.prototype.open = function(opt_data) {
 /**
  * @inheritDoc
  */
-tuna.ui.selection.NavigationPage.prototype.destroy = function() {
+tuna.ui.nav.NavigationPage.prototype.destroy = function() {
     tuna.ui.Container.prototype.destroy.call(this);
 
     this._isInitialized = false;

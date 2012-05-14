@@ -1,10 +1,14 @@
+
+
+
 /**
  * @constructor
  * @extends tuna.ui.Widget
  * @param {!Node} target
+ * @param {tuna.ui.Container=} opt_container
  */
-tuna.ui.buttons.ButtonGroup = function(target) {
-    tuna.ui.Widget.call(this, target);
+tuna.ui.buttons.ButtonGroup = function(target, opt_container) {
+    tuna.ui.Widget.call(this, target, opt_container);
 
     /**
      * @private
@@ -13,15 +17,17 @@ tuna.ui.buttons.ButtonGroup = function(target) {
     this.__defaultAction = null;
 
     /**
-     * @type {boolean}
      * @private
+     * @type {boolean}
      */
     this.__isPreventDefault = true;
 
     this._setDefaultOption('button-selector', '.j-button');
 };
 
+
 tuna.utils.extend(tuna.ui.buttons.ButtonGroup, tuna.ui.Widget);
+
 
 /**
  * @param {string} action
@@ -29,6 +35,7 @@ tuna.utils.extend(tuna.ui.buttons.ButtonGroup, tuna.ui.Widget);
 tuna.ui.buttons.ButtonGroup.prototype.setDefaultAction = function(action) {
     this.__defaultAction = action;
 };
+
 
 /**
  * @param {boolean} isPreventDefault
@@ -38,6 +45,7 @@ tuna.ui.buttons.ButtonGroup.prototype.setPreventDefault
 
     this.__isPreventDefault = isPreventDefault;
 };
+
 
 /**
  * @override

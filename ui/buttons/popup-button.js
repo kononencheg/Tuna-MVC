@@ -1,10 +1,12 @@
+
 /**
  * @constructor
  * @extends tuna.ui.buttons.Button
  * @param {!Node} target
+ * @param {tuna.ui.Container=} opt_container
  */
-tuna.ui.buttons.PopupButton = function(target) {
-    tuna.ui.buttons.Button.call(this, target);
+tuna.ui.buttons.PopupButton = function(target, opt_container) {
+    tuna.ui.buttons.Button.call(this, target, opt_container);
 
     /**
      *
@@ -45,4 +47,12 @@ tuna.ui.buttons.PopupButton.prototype.init = function() {
  */
 tuna.ui.buttons.PopupButton.prototype.getPopup = function() {
     return this._popup;
+};
+
+
+/**
+ * @override
+ */
+tuna.ui.buttons.PopupButton.prototype.clone = function(target, opt_container) {
+    return tuna.ui.Widget.prototype.clone.call(this, target, opt_container);
 };

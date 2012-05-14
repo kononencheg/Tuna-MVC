@@ -11,7 +11,7 @@ tuna.ui.selection.collection.NamedCollection = function(widgetGroup) {
 
     /**
      * @private
-     * @type {!Object.<(string|number), !tuna.ui.IWidget>}
+     * @type {!Object.<(string|number), !tuna.ui.Widget>}
      */
     this.__widgets = {};
 };
@@ -26,7 +26,9 @@ tuna.utils.extend(
 /**
  * @override
  */
-tuna.ui.selection.collection.NamedCollection.prototype.addItem = function(item) {
+tuna.ui.selection.collection.NamedCollection.prototype
+    .addItem = function(item) {
+
     var name = item.getName();
     if (name !== null) {
         this.__widgets[name] = item;
@@ -35,6 +37,19 @@ tuna.ui.selection.collection.NamedCollection.prototype.addItem = function(item) 
     }
 
     return name;
+};
+
+
+/**
+ * @override
+ */
+tuna.ui.selection.collection.NamedCollection.prototype
+    .removeItemAt = function(index) {
+
+    if (this.__widgets[index] !== undefined) {
+        this._widgetGroup.handleRemovedWidget(this.__widgets[index], index);
+        delete this.__widgets[index];
+    }
 };
 
 

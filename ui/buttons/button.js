@@ -4,13 +4,14 @@
  * @constructor
  * @extends tuna.ui.Widget
  * @param {!Node} target
+ * @param {tuna.ui.Container=} opt_container
  */
-tuna.ui.buttons.Button = function(target) {
-    tuna.ui.Widget.call(this, target);
+tuna.ui.buttons.Button = function(target, opt_container) {
+    tuna.ui.Widget.call(this, target, opt_container);
 
     /**
      * @protected
-     * @type boolean
+     * @type {boolean}
      */
     this._isInit = false;
 };
@@ -40,4 +41,12 @@ tuna.ui.buttons.Button.prototype.init = function() {
  */
 tuna.ui.buttons.Button.prototype.setActive = function(isActive) {
     tuna.dom.setClassExist(this._target, 'active', isActive);
+};
+
+
+/**
+ * @override
+ */
+tuna.ui.buttons.Button.prototype.clone = function(target, opt_container) {
+    return tuna.ui.buttons.create(target, opt_container);
 };

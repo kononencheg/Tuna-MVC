@@ -14,7 +14,7 @@
  * @constructor
  * @extends {tuna.ui.Widget}
  * @param {!Node} target
- * @param {!tuna.ui.Container=} opt_container Родительский контейнер.
+ * @param {tuna.ui.Container=} opt_container Родительский контейнер.
  */
 tuna.ui.Container = function(target, opt_container) {
     tuna.ui.Widget.call(this, target, opt_container);
@@ -108,7 +108,7 @@ tuna.ui.Container.prototype.initWidgets = function(target, opt_types) {
  * @param {string} type
  */
 tuna.ui.Container.prototype.initWidgetsByType = function(target, type) {
-    if (target.id === null) {
+    if (target.id === '') {
         target.id = 'container_' + tuna.ui.__lastId++;
     }
 
@@ -117,10 +117,26 @@ tuna.ui.Container.prototype.initWidgetsByType = function(target, type) {
         this.__idWidgets[id] = {};
     }
 
-    var targets = tuna.ui.findWidgetsTargets(type, target, true, false);
+    var selector = tuna.ui.getSelector(type);
+    var factory = tuna.ui.getFactory(type);
 
-    this.__idWidgets[id][type] =
-        tuna.ui.createWidgets(type, targets, true, this);
+    if (factory !== null && selector !== null) {
+        var targets = tuna.ui.findTargets(selector, target, true, false);
+        var widgets = [];
+
+        var widget = null;
+        while (targets.length > 0) {
+            widget = factory.createWidget(targets.shift(), this);
+
+            if (widget !== null) {
+                widget.init();
+
+                widgets.push(widget);
+            }
+        }
+
+        this.__idWidgets[id][type] = widgets;
+    }
 };
 
 
