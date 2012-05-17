@@ -16,9 +16,10 @@ tuna.ui.nav.NavigationMenu = function(target, opt_container) {
      * @type {!Object.<string, !Node>}
      * @private
      */
-    this.__menuItems = {};
+    this.__menuLinks = {};
 
-    this._setDefaultOption('link-selector', '.j-link');
+    this._setDefaultOption('link-selector', 'a.j-link');
+    this._setDefaultOption('item-selector', 'li');
     this._setDefaultOption('selection-class', 'active');
 };
 
@@ -44,11 +45,14 @@ tuna.ui.nav.NavigationMenu.prototype.update = function() {
         var item = null;
         while (items.length > 0) {
             item = items.shift();
-            path = item.getAttribute('href') ||
-                   item.getAttribute('data-href');
+            path = item.getAttribute('href');
 
             if (path !== null) {
-                this.__menuItems[path.split('/').shift()] = item;
+                if (path.indexOf('/') === 0) {
+                    path = path.substr(1);
+                }
+
+                this.__menuLinks[path.split('/').shift()] = item;
             }
         }
     }
@@ -58,18 +62,22 @@ tuna.ui.nav.NavigationMenu.prototype.update = function() {
 /**
  * @inheritDoc
  */
-tuna.ui.nav.NavigationMenu.prototype.handlePage = function(index) {
+tuna.ui.nav.NavigationMenu.prototype.handlePath = function(pageIndex) {
     var selectionClass = this.getStringOption('selection-class');
+    var itemSelector = this.getStringOption('item-selector');
+    
     if (selectionClass !== null) {
-        for (var i in this.__menuItems) {
-            tuna.dom.setClassExist
-                (this.__menuItems[i], selectionClass, i === index);
+        var item = null;
+        for (var i in this.__menuLinks) {
+            item = this.__menuLinks[i];
+            
+            if (itemSelector !== null) {
+                item = tuna.dom.getParentMatches(item, itemSelector, this._target);
+            }
+
+            if (item !== null) {
+                tuna.dom.setClassExist(item, selectionClass, i === pageIndex);
+            }
         }
     }
 };
-
-
-/**
- * @inheritDoc
- */
-tuna.ui.nav.NavigationMenu.prototype.handlePath = function() {};

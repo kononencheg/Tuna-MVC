@@ -11,18 +11,56 @@ tuna.ui.buttons.ButtonGroup = function(target, opt_container) {
     tuna.ui.Widget.call(this, target, opt_container);
 
     /**
-     * @private
-     * @type {?string}
+     * @type {string}
+     * @protected
      */
-    this.__defaultAction = null;
+    this.__buttonsSelector = '';
 
     /**
-     * @private
-     * @type {boolean}
+     * @type {!Object.<string, string>}
+     * @protected
      */
-    this.__isPreventDefault = true;
+    this.__selectorActions = {};
 
-    this._setDefaultOption('button-selector', '.j-button');
+    /**
+     * @type {tuna.ui.IWidgetFactory}
+     * @protected
+     */
+    this._buttonFactory = null;
+
+    /**
+     * @type {!Array.<!tuna.ui.Widget>}
+     * @protected
+     */
+    this.__buttons = [];
+
+    var self = this;
+
+    /**
+     * @type {function(Event)}
+     * @private
+     */
+    this.__clickHandler = function(event) {
+        tuna.dom.preventDefault(event);
+
+        var button = tuna.ui.buttons.getButton(this);
+        if (button === null) {
+            button = self._buttonFactory.createWidget(this, self._container);
+            button.init();
+
+            self.__buttons.push(button);
+            
+            tuna.ui.buttons.registerButton(button);
+        }
+
+        for (var selector in self.__selectorActions) {
+            if (tuna.dom.matchesSelector(this, selector)) {
+                if (!self.dispatch(self.__selectorActions[selector], button)) {
+                    tuna.dom.stopPropagation(event);
+                }
+            }
+        }
+    };
 };
 
 
@@ -30,49 +68,62 @@ tuna.utils.extend(tuna.ui.buttons.ButtonGroup, tuna.ui.Widget);
 
 
 /**
- * @param {string} action
+ * @override
  */
-tuna.ui.buttons.ButtonGroup.prototype.setDefaultAction = function(action) {
-    this.__defaultAction = action;
-};
+tuna.ui.buttons.ButtonGroup.prototype.init = function() {
+    this._buttonFactory = this._createFactory();
 
+    var actionSelectors =
+        tuna.dom.getAttributesData(this._target, 'data-action-');
 
-/**
- * @param {boolean} isPreventDefault
- */
-tuna.ui.buttons.ButtonGroup.prototype.setPreventDefault
-    = function(isPreventDefault) {
+    var selectors = [];
+    var selector = null;
+    for (var action in actionSelectors) {
+        selector = actionSelectors[action];
+        this.__selectorActions[selector] = action;
+        selectors.push(selector);
+    }
 
-    this.__isPreventDefault = isPreventDefault;
+    this.__buttonsSelector = selectors.join(',');
+
+    tuna.dom.addChildEventListener
+        (this._target, this.__buttonsSelector, 'click', this.__clickHandler);
 };
 
 
 /**
  * @override
  */
-tuna.ui.buttons.ButtonGroup.prototype.init = function() {
-    var self = this;
+tuna.ui.buttons.ButtonGroup.prototype.destroy = function() {
+    tuna.dom.removeChildEventListener
+        (this._target, this.__buttonsSelector, 'click', this.__clickHandler);
 
-    var buttonSelector = this.getStringOption('button-selector');
-    if (buttonSelector !== null) {
-        tuna.dom.addChildEventListener(
-            this._target, buttonSelector, 'click', function(event) {
-                if (self.__isPreventDefault) {
-                    tuna.dom.preventDefault(event);
-                }
-
-                var button = tuna.ui.buttons.create(this);
-                var action = button.getStringOption('action');
-                if (action === null) {
-                    action = self.__defaultAction;
-                }
-
-                if (action !== null) {
-                    if (!self.dispatch(action, button)) {
-                        tuna.dom.stopPropagation(event);
-                    }
-                }
-            }
-        );
+    this.__buttonsSelector = '';
+    this.__classActions = {};
+    
+    while (this.__buttons.length > 0) {
+        this.__buttons.shift().destroy();
     }
+
+    this._destroyFactory();
+
+    tuna.ui.Widget.prototype.destroy.call(this);
+};
+
+
+/**
+ * @return {tuna.ui.IWidgetFactory}
+ * @protected
+ */
+tuna.ui.buttons.ButtonGroup.prototype._createFactory = function() {
+    return new tuna.ui.WidgetFactory
+        (new tuna.ui.buttons.Button(tuna.ui.DUMMY_NODE));
+};
+
+
+/**
+ * @protected
+ */
+tuna.ui.buttons.ButtonGroup.prototype._destroyFactory = function() {
+    this._buttonFactory = null;
 };

@@ -1,6 +1,7 @@
+
+
+
 /**
- * TODO: Button factory and stuff
- *
  * @constructor
  * @extends tuna.ui.Widget
  * @param {!Node} target
@@ -9,44 +10,35 @@
 tuna.ui.buttons.Button = function(target, opt_container) {
     tuna.ui.Widget.call(this, target, opt_container);
 
+    var self = this;
+
     /**
-     * @protected
-     * @type {boolean}
+     * @type {function(Event)}
+     * @private
      */
-    this._isInit = false;
+    this.__clickHandler = function(event) {
+        if (self.isEnabled()) {
+            self.dispatch('click');
+        } else {
+            tuna.dom.stopPropagation(event);
+        }
+    };
 };
 
+
 tuna.utils.extend(tuna.ui.buttons.Button, tuna.ui.Widget);
+
 
 /**
  * @override
  */
 tuna.ui.buttons.Button.prototype.init = function() {
-    if (!this._isInit) {
-        this._isInit = true;
-
-        var self = this;
-        tuna.dom.addEventListener(this._target, 'click', function(event) {
-            if (self.isEnabled()) {
-                self.dispatch('click');
-            } else {
-                tuna.dom.stopPropagation(event);
-            }
-        });
-    }
-};
-
-/**
- * @param {boolean} isActive
- */
-tuna.ui.buttons.Button.prototype.setActive = function(isActive) {
-    tuna.dom.setClassExist(this._target, 'active', isActive);
+    tuna.dom.addEventListener(this._target, 'click', this.__clickHandler);
 };
 
 
-/**
- * @override
- */
-tuna.ui.buttons.Button.prototype.clone = function(target, opt_container) {
-    return tuna.ui.buttons.create(target, opt_container);
+tuna.ui.buttons.Button.prototype.destroy = function() {
+    tuna.dom.removeEventListener(this._target, 'click', this.__clickHandler);
+
+    tuna.ui.Widget.prototype.destroy.call(this);
 };

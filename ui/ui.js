@@ -80,20 +80,11 @@ tuna.ui.transformers = {};
 
 
 
-
-/**
- * @private
- * @type {number}
- */
-tuna.ui.__lastId = 0;
-
-
 /**
  * @private
  * @type {!Object.<string, !tuna.ui.IWidgetFactory>}
  */
 tuna.ui.__factoryTable = {};
-
 
 
 /**
@@ -124,7 +115,7 @@ tuna.ui.DUMMY_NODE = document.createElement('div');
  * @param {string} type Тип создаваемого фабрикой виджета.
  * @param {!tuna.ui.IWidgetFactory} widgetFactory Фабрика виджетов.
  */
-tuna.ui.registerTypeFactory = function(type, widgetFactory) {
+tuna.ui.registerFactory = function(type, widgetFactory) {
     tuna.ui.__factoryTable[type] = widgetFactory;
 };
 
@@ -133,7 +124,7 @@ tuna.ui.registerTypeFactory = function(type, widgetFactory) {
  * @param {string} type
  * @param {!tuna.ui.Widget} widgetPrototype
  */
-tuna.ui.registerTypePrototype = function(type, widgetPrototype) {
+tuna.ui.registerPrototype = function(type, widgetPrototype) {
     tuna.ui.__factoryTable[type] = new tuna.ui.WidgetFactory(widgetPrototype);
 };
 
@@ -151,7 +142,7 @@ tuna.ui.getFactory = function(type) {
  * @param {string} type
  * @param {string} selector
  */
-tuna.ui.registerTypeSelector = function(type, selector) {
+tuna.ui.registerSelector = function(type, selector) {
     tuna.ui.__selectorsTable[type] = selector;
 };
 

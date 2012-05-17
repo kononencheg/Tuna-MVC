@@ -2,7 +2,7 @@
 
 /**
  * @private
- * @type {!Object.<string, !tuna.ui.buttons.Button>}
+ * @type {!Object.<string, !tuna.ui.Widget>}
  */
 tuna.ui.buttons.__idTable = {};
 
@@ -16,20 +16,26 @@ tuna.ui.buttons.__lastId = 0;
 
 /**
  * @param {!Node} target
- * @param {tuna.ui.Container=} opt_container
- * @return {!tuna.ui.buttons.Button}
+ * @return {tuna.ui.Widget}
  */
-tuna.ui.buttons.create = function(target, opt_container) {
+tuna.ui.buttons.getButton = function(target) {
+    if (target.id !== '') {
+        return tuna.ui.buttons.__idTable[target.id] || null;
+    }
+
+    return null;
+};
+
+
+/**
+ * @param {!tuna.ui.Widget} button
+ */
+tuna.ui.buttons.registerButton = function(button) {
+    var target = button.getTarget();
     if (target.id === '') {
         target.id = 'button_' + tuna.ui.buttons.__lastId++;
     }
 
-    if (tuna.ui.buttons.__idTable[target.id] === undefined) {
-        var button = new tuna.ui.buttons.Button(target, opt_container);
-        button.init();
-
-        tuna.ui.buttons.__idTable[target.id] = button;
-    }
-
-    return tuna.ui.buttons.__idTable[target.id];
+    tuna.ui.buttons.__idTable[target.id] = button;
 };
+

@@ -47,10 +47,38 @@ tuna.ui.nav.Navigation = function(target, opt_container) {
      */
     this._handlers = [];
 
+    /**
+     * @type {!tuna.ui.buttons.ButtonGroup}
+     * @protected
+     */
+    this._controls = new tuna.ui.buttons.ButtonGroup(target, opt_container);
+
+
+    var self = this;
+
+    /**
+     * @type {function()}
+     * @private
+     */
+     this.__navigateHandler = function(event, button) {
+         var path = button.getTarget().getAttribute('href');
+         if (path !== null) {
+            self.navigate(path, button.getOptions());
+         }
+     };
+
+    /**
+     * @type {function()}
+     * @private
+     */
+    this.__backHandler = function(event) {
+        self.back();
+    };
 
     this._setDefaultOption('item-selector', '.j-navigation-page');
-    this._setDefaultOption('link-selector', '.j-link');
-    this._setDefaultOption('back-link-selector', '.j-back-link');
+
+    this._controls.setOption('action-navigate', 'a.j-link');
+    this._controls.setOption('action-back', '.j-history-back');
 };
 
 
@@ -70,38 +98,15 @@ tuna.ui.nav.Navigation.prototype.init = function() {
         }
     }
 
-    var self = this;
+    this._controls.init();
+    this._controls.addEventListener('navigate', this.__navigateHandler);
+    this._controls.addEventListener('back', this.__backHandler);
 
-    var linkSelector = this.getStringOption('link-selector');
-    if (linkSelector !== null) {
-        tuna.dom.addChildEventListener(
-            this._target, linkSelector, 'click', function(event) {
-                tuna.dom.preventDefault(event);
-                tuna.dom.stopPropagation(event);
+    if (this._target === document.body) {
+        tuna.dom.addEventListener(window, 'popstate', this.__backHandler);
 
-                var path = this.getAttribute('href') ||
-                           this.getAttribute('data-href');
-
-                if (path !== null) {
-                    var data = tuna.dom.getAttributesData(this);
-                    delete data['href'];
-
-                    self.navigate(path, data);
-                }
-            }
-        );
-    }
-
-    var backLinkSelector = this.getStringOption('back-link-selector');
-    if (backLinkSelector !== null) {
-        tuna.dom.addChildEventListener(
-            this._target, backLinkSelector, 'click', function(event) {
-                tuna.dom.preventDefault(event);
-                tuna.dom.stopPropagation(event);
-
-                self.back();
-            }
-        );
+        this.navigate
+           (location.pathname, tuna.utils.urlDecode(location.search.substr(1)));
     }
 };
 
@@ -110,6 +115,15 @@ tuna.ui.nav.Navigation.prototype.init = function() {
  * @inheritDoc
  */
 tuna.ui.nav.Navigation.prototype.destroy = function() {
+    this._controls.removeEventListener('navigate', this.__navigateHandler);
+    this._controls.removeEventListener('back', this.__backHandler);
+
+    this._controls.destroy();
+
+    if (this._target === document.body) {
+        tuna.dom.removeEventListener(window, 'popstate', this.__backHandler);
+    }
+
     if (this._parent !== null) {
         this._parent.removeChild(this);
     }
@@ -167,22 +181,6 @@ tuna.ui.nav.Navigation.prototype.handleCreatedWidget = function(page) {
 };
 
 
-
-tuna.ui.nav.Navigation.prototype.back = function() {
-    if (this.isRoot()) {
-        if (this._history.length > 0) {
-            this._currentState = this._history.pop();
-
-            this._navigatePath
-                (this._currentState.getPath(), this._currentState.getData());
-        }
-    } else {
-        this.getRoot().back();
-    }
-
-};
-
-
 /**
  * @param {string|!Array.<string>} path
  * @param {Object.<string, string>=} opt_data
@@ -207,49 +205,30 @@ tuna.ui.nav.Navigation.prototype.navigate = function(path, opt_data) {
         }
 
     } else {
-        var parsedPath = path.split('/');
+        var fullPath = path.split('/');
 
         if (path.indexOf('/') !== 0) {
-            parsedPath = this.getRelatedPath().concat(parsedPath);
+            fullPath = this.getAbsolutePath().concat(fullPath);
         }
 
-        this.getRoot().navigate(parsedPath, opt_data);
+        this.getRoot().navigate(fullPath, opt_data);
     }
 };
 
 
-/**
- * @param {string} index
- * @param {Object.<string, string>=} opt_data
- */
-tuna.ui.nav.Navigation.prototype.openPage = function(index, opt_data) {
-    if (this._selectionState.isEnabled(index) &&
-       !this._selectionState.isSelected(index)) {
 
-        if (this._currentPage === null ||
-            this._currentPage.canClose(index)) {
+tuna.ui.nav.Navigation.prototype.back = function() {
+    if (this.isRoot()) {
+        if (this._history.length > 0) {
+            this._currentState = this._history.pop();
 
-            var page = this._collection.getItemAt(index);
-            if (page instanceof tuna.ui.nav.NavigationPage) {
-                page.open(opt_data);
-
-                this._currentPage = page;
-
-                this._selectionRule.selectIndex(index);
-
-                var i = this._handlers.length - 1;
-                while (i >= 0) {
-                    this._handlers[i].handlePage(index, opt_data);
-
-                    i--;
-                }
-
-                this.dispatch('open-page', index);
-
-                this._currentPage = page;
-            }
+            this._navigatePath
+                (this._currentState.getPath(), this._currentState.getData());
         }
+    } else {
+        this.getRoot().back();
     }
+
 };
 
 
@@ -259,24 +238,69 @@ tuna.ui.nav.Navigation.prototype.openPage = function(index, opt_data) {
  * @param {Object.<string, string>=} opt_data
  */
 tuna.ui.nav.Navigation.prototype._navigatePath = function(path, opt_data) {
-    var i = this._handlers.length - 1;
-    while (i >= 0) {
-        this._handlers[i].handlePath(path, opt_data);
-
-        i--;
-    }
-
     var index = path.shift();
     while (index === '' && path.length > 0) {
         index = path.shift();
     }
 
     if (index !== undefined) {
-        this.openPage(index, opt_data);
+        this._handlePath(index, path, opt_data);
+        this._openPage(index, opt_data);
 
         if (this._children[index] !== undefined) {
             this._children[index]._navigatePath(path, opt_data);
         }
+    }
+};
+
+
+/**
+ * @protected
+ * @param {string} index
+ * @param {Object.<string, string>=} opt_data
+ */
+tuna.ui.nav.Navigation.prototype._openPage = function(index, opt_data) {
+    if (this._selectionState.isEnabled(index) &&
+        !this._selectionState.isSelected(index)) {
+
+        if (this._currentPage === null ||
+            this._currentPage.canClose(index)) {
+
+            var page = this._collection.getItemAt(index);
+            if (page instanceof tuna.ui.nav.NavigationPage) {
+                this._currentPage = page;
+                this._currentPage.open(opt_data);
+
+                this._selectionRule.selectIndex(index);
+            }
+        }
+    }
+};
+
+
+tuna.ui.nav.Navigation.prototype
+    ._handlePath = function(pageIndex, restPath, opt_data) {
+
+    if (this._target === document.body &&
+        window.history.pushState !== undefined) {
+
+        var location = '/' + pageIndex + '/' + restPath.join('/');
+
+        if (opt_data !== undefined) {
+            var encodedData = tuna.utils.urlEncode(opt_data);
+            if (encodedData.length > 0) {
+                location += '?' + encodedData;
+            }
+        }
+
+        window.history.pushState(null, '', location);
+    }
+
+    var i = this._handlers.length - 1;
+
+    while (i >= 0) {
+        this._handlers[i].handlePath(pageIndex, restPath, opt_data);
+        i--;
     }
 };
 
@@ -346,14 +370,14 @@ tuna.ui.nav.Navigation.prototype.getPath = function() {
 /**
  * @return {!Array.<string>}
  */
-tuna.ui.nav.Navigation.prototype.getRelatedPath = function() {
+tuna.ui.nav.Navigation.prototype.getAbsolutePath = function() {
     var result = [];
 
     if (this._parent !== null) {
         var index = this.getName();
         if (index !== null) {
             result.push(index);
-            result = this._parent.getRelatedPath().concat(result);
+            result = this._parent.getAbsolutePath().concat(result);
         }
     }
 
@@ -368,10 +392,10 @@ tuna.ui.nav.Navigation.prototype.addHandler = function(handler) {
     if (tuna.utils.indexOf(handler, this._handlers) === -1) {
         this._handlers.push(handler);
 
-        var index = this._selectionState.getLastSelectedIndex();
-        if (index !== null) {
-            handler.handlePage(index);
-        }
+        var path = this.getPath();
+        var index = path.shift();
+
+        handler.handlePath(index, path);
     }
 };
 

@@ -13,6 +13,6 @@ tuna.ui.IWidgetFactory = function() {};
  *        инициализируется виджет.
  * @return {!tuna.ui.Widget} Созданный виджет.
  */
-tuna.ui.IWidgetFactory.prototype.createWidget =
-    function(target, opt_container) {};
+tuna.ui.IWidgetFactory.prototype
+    .createWidget = function(target, opt_container) {};
 
