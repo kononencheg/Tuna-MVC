@@ -9,7 +9,6 @@ tuna.ui.buttons.PopupButton = function(target, opt_container) {
     tuna.ui.buttons.Button.call(this, target, opt_container);
 
     /**
-     *
      * @type {tuna.ui.popups.Popup}
      * @private
      */
@@ -26,7 +25,8 @@ tuna.ui.buttons.PopupButton.prototype.init = function() {
     if (popupId !== null) {
         var popupTarget = tuna.dom.selectOne('#' + popupId);
         if (popupTarget !== null) {
-            this._popup = tuna.ui.popups.create(popupTarget);
+            this._popup
+                = new tuna.ui.popups.Popup(popupTarget, this._container);
         }
     }
 
@@ -47,12 +47,4 @@ tuna.ui.buttons.PopupButton.prototype.init = function() {
  */
 tuna.ui.buttons.PopupButton.prototype.getPopup = function() {
     return this._popup;
-};
-
-
-/**
- * @override
- */
-tuna.ui.buttons.PopupButton.prototype.clone = function(target, opt_container) {
-    return tuna.ui.Widget.prototype.clone.call(this, target, opt_container);
 };

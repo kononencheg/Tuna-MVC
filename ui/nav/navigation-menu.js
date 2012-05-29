@@ -19,7 +19,6 @@ tuna.ui.nav.NavigationMenu = function(target, opt_container) {
     this.__menuLinks = {};
 
     this._setDefaultOption('link-selector', 'a.j-link');
-    this._setDefaultOption('item-selector', 'li');
     this._setDefaultOption('selection-class', 'active');
 };
 
@@ -70,7 +69,7 @@ tuna.ui.nav.NavigationMenu.prototype.handlePath = function(pageIndex) {
         var item = null;
         for (var i in this.__menuLinks) {
             item = this.__menuLinks[i];
-            
+
             if (itemSelector !== null) {
                 item = tuna.dom.getParentMatches(item, itemSelector, this._target);
             }

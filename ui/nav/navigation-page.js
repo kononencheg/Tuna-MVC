@@ -43,6 +43,35 @@ tuna.ui.nav.NavigationPage.prototype.getNavigation = function() {
 };
 
 
+tuna.ui.nav.NavigationPage.prototype.init = function() {};
+
+
+/**
+ * @inheritDoc
+ */
+tuna.ui.nav.NavigationPage.prototype.destroy = function() {
+    tuna.ui.Container.prototype.destroy.call(this);
+
+    this._isInitialized = false;
+};
+
+
+/**
+ * @param {Object.<string, string>=} opt_data Данные сопуствующие открытию.
+ */
+tuna.ui.nav.NavigationPage.prototype.open = function(opt_data) {
+    if (!this._isInitialized) {
+        tuna.ui.Container.prototype.init.call(this);
+        this._isInitialized = true;
+    }
+
+    if (this._controller instanceof tuna.control.PageController) {
+        this._controller.open(opt_data || null);
+    }
+
+};
+
+
 /**
  * @param {string} index
  */
@@ -58,31 +87,4 @@ tuna.ui.nav.NavigationPage.prototype.canClose = function(index) {
     }
 
     return true;
-};
-
-
-/**
- * @param {Object.<string, string>=} opt_data Данные сопуствующие открытию.
- */
-tuna.ui.nav.NavigationPage.prototype.open = function(opt_data) {
-    if (!this._isInitialized) {
-        tuna.ui.Container.prototype.init.call(this);
-
-        this._isInitialized = true;
-    }
-
-    if (this._controller instanceof tuna.control.PageController) {
-        this._controller.open(opt_data || null);
-    }
-
-};
-
-
-/**
- * @inheritDoc
- */
-tuna.ui.nav.NavigationPage.prototype.destroy = function() {
-    tuna.ui.Container.prototype.destroy.call(this);
-
-    this._isInitialized = false;
 };

@@ -1,3 +1,6 @@
+
+
+
 /**
  * @constructor
  * @extends tuna.ui.Widget
@@ -9,30 +12,26 @@ tuna.ui.forms.Form = function(target, opt_container) {
 
     /**
      * @private
-     * @type Node
+     * @type {Node}
      */
     this.__formMessage = null;
 
     /**
      * @private
-     * @type Object.<string, tuna.ui.forms.FormInput>
+     * @type {!Object.<string, !tuna.ui.forms.InputWrapper>}
      */
     this.__inputTable = {};
 
-    /**
-     * @private
-     * @type ?string
-     */
-    this.__recordName = null;
 };
 
+
 tuna.utils.extend(tuna.ui.forms.Form, tuna.ui.Widget);
+
 
 /**
  * @override
  */
 tuna.ui.forms.Form.prototype.init = function() {
-    this.__recordName = this.getStringOption('record-type');
     this.__formMessage = tuna.dom.selectOne('.j-form-message', this._target);
 
     var callbackInput = document.createElement('input');
@@ -68,95 +67,126 @@ tuna.ui.forms.Form.prototype.init = function() {
     });
 };
 
+
+/**
+ * @override
+ */
+tuna.ui.forms.Form.prototype.disable = function() {
+    // ...
+};
+
+
 /**
  * @param {string} name
- * @return {?string|Array.<string>}
+ * @return {*}
  */
 tuna.ui.forms.Form.prototype.getValue = function(name) {
-    var result = null;
+    var result = new tuna.utils.SafeObject({});
 
-    var element = this._target.elements[name];
-    if (element !== undefined) {
-        var isCheck = false;
+    var elements = tuna.utils.toArray(this._target.elements);
+    var i = 0,
+        l = elements.length;
 
-        if (element.value === undefined) {
-            var i = 0,
-                l = element.length;
+    var element = null;
+    var value = null;
+    while (i < l) {
+        element = elements[i];
 
-            result = [];
+        if (element.name !== undefined && element.name.length > 0 &&
+           (element.name === name || element.name.indexOf(name + '[') === 0)) {
 
-            while (i < l) {
-                isCheck = element[i].type === 'checkbox' ||
-                          element[i].type === 'radio';
+            value = this.__getInputValue(element);
 
-                if (!isCheck || (isCheck && element[i].checked)) {
-                    result.push(element[i].value);
-                }
-
-                i++;
+            if (value !== null) {
+                result.setByPath(value, tuna.utils.parseUrlToken(element.name));
             }
+        }
 
-        } else {
-            isCheck = element.type === 'checkbox' ||
-                      element.type === 'radio';
+        i++;
+    }
 
-            if (!isCheck || (isCheck && element.checked)) {
-                result = element.value;
-            }
+    return result.get(name);
+};
+
+
+/**
+ * @param {string} name
+ * @param {*} value
+ */
+tuna.ui.forms.Form.prototype.setValue = function(name, value) {
+    var data = new tuna.utils.SafeObject({});
+    data.set(value, name);
+
+    var elements = tuna.utils.toArray(this._target.elements);
+    var i = 0,
+        l = elements.length;
+
+    var element = null;
+    while (i < l) {
+        element = elements[i];
+
+        if (element.name !== undefined && element.name.length > 0 &&
+           (element.name === name || element.name.indexOf(name + '[') === 0)) {
+
+            this.__setInputValue
+              (element, data.getByPath(tuna.utils.parseUrlToken(element.name)));
+        }
+
+        i++;
+    }
+};
+
+
+/**
+ * @param {!Node} input
+ * @return {?string}
+ * @private
+ */
+tuna.ui.forms.Form.prototype.__getInputValue = function(input) {
+    if (input.value !== undefined && !input.disabled) {
+        if (input.type !== 'checkbox' &&
+            input.type !== 'radio' || input.checked) {
+            return input.value
         }
     }
 
-    return result;
+    return null;
 };
 
+
 /**
- *
- * @param {string} name
- * @param {string|Array.<string>} value
+ * @param {!Node} input
+ * @param {*} value
  */
-tuna.ui.forms.Form.prototype.setValue = function(name, value) {
-    var element = this._target.elements[name];
-    if (element !== undefined) {
-        if (element.value === undefined) {
-            var i = 0,
-                l = element.length;
+tuna.ui.forms.Form.prototype.__setInputValue = function(input, value) {
+    if (input.value !== undefined && !input.disabled) {
+        if (value === null) {
+            value = '';
+        }
 
-            var stringValue = '';
-            var arrayValue = [];
-
+        if (input.type !== 'checkbox' &&
+            input.type !== 'radio') {
+            input.value = value.toString();
+        } else {
             if (value instanceof Array) {
-                arrayValue = tuna.utils.cloneArray(value);
-                stringValue = value.join(',');
-            } else {
-                stringValue = value + '';
-                arrayValue = [ stringValue ];
-            }
+                var checked = false;
 
-            var index = -1;
-            while (i < l) {
-                if (element[i].type === 'radio') {
-                    element[i].checked = element[i].value === stringValue;
-                } else if (element[i].type === 'checkbox') {
-                    index = tuna.utils.indexOf(element[i].value, arrayValue);
+                var i = 0,
+                    l = value.length;
 
-                    element[i].checked = index !== -1;
+                while (i < l) {
+                    if (input.value === value[i].toString()) {
+                        checked = true;
 
-                    if (index !== -1) {
-                        arrayValue.splice(index, 1);
+                        break;
                     }
-                } else {
-                    element.value = stringValue;
+
+                    i++;
                 }
 
-                i++;
-            }
-
-        } else {
-            if (element.type === 'checkbox' ||
-                element.type === 'radio') {
-                element.checked = element.value === value;
+                input.checked = checked;
             } else {
-                element.value = value;
+                input.checked = input.value === value.toString();
             }
         }
     }
@@ -234,8 +264,9 @@ tuna.ui.forms.Form.prototype.__handleResponse = function(data) {
     var errors = data['errors'];
 
     if (response !== undefined) {
-        if (this.__recordName !== null) {
-            response = tuna.rest.populateRecords(response, this.__recordName);
+        var recordName = this.getStringOption('record-type');
+        if (recordName !== null) {
+            response = tuna.rest.populateRecords(response, recordName);
         }
 
         this.dispatch('result', response);
@@ -269,7 +300,7 @@ tuna.ui.forms.Form.prototype.__showErrors = function(errors) {
 /**
  * @private
  * @param {string} name
- * @return {tuna.ui.forms.FormInput}
+ * @return {tuna.ui.forms.InputWrapper}
  */
 tuna.ui.forms.Form.prototype.__getFormInput = function(name) {
     var result = null;
@@ -279,7 +310,7 @@ tuna.ui.forms.Form.prototype.__getFormInput = function(name) {
             = tuna.dom.selectOne('.j-' + name + '-input', this._target);
 
         if (inputWrapper !== null) {
-            var input = new tuna.ui.forms.FormInput(inputWrapper);
+            var input = new tuna.ui.forms.InputWrapper(inputWrapper);
             input.init();
 
             this.__inputTable[name] = input;

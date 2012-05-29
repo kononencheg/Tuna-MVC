@@ -14,7 +14,7 @@ tuna.ui.buttons.ButtonGroup = function(target, opt_container) {
      * @type {string}
      * @protected
      */
-    this.__buttonsSelector = '';
+    this._buttonsSelector = '';
 
     /**
      * @type {!Object.<string, string>}
@@ -29,10 +29,11 @@ tuna.ui.buttons.ButtonGroup = function(target, opt_container) {
     this._buttonFactory = null;
 
     /**
-     * @type {!Array.<!tuna.ui.Widget>}
+     * @type {!Object.<string, !tuna.ui.Widget>}
      * @protected
      */
-    this.__buttons = [];
+    this._buttons = {};
+
 
     var self = this;
 
@@ -43,14 +44,12 @@ tuna.ui.buttons.ButtonGroup = function(target, opt_container) {
     this.__clickHandler = function(event) {
         tuna.dom.preventDefault(event);
 
-        var button = tuna.ui.buttons.getButton(this);
+        var button = self._getButton(this);
         if (button === null) {
             button = self._buttonFactory.createWidget(this, self._container);
             button.init();
 
-            self.__buttons.push(button);
-            
-            tuna.ui.buttons.registerButton(button);
+            self._saveButton(button);
         }
 
         for (var selector in self.__selectorActions) {
@@ -68,6 +67,18 @@ tuna.utils.extend(tuna.ui.buttons.ButtonGroup, tuna.ui.Widget);
 
 
 /**
+ *
+ * @param {string} action
+ * @param {?string} selector
+ */
+tuna.ui.buttons.ButtonGroup.prototype.addAction = function(action, selector) {
+    if (selector !== null && selector.length > 0) {
+        this.__selectorActions[selector] = action;
+    }
+};
+
+
+/**
  * @override
  */
 tuna.ui.buttons.ButtonGroup.prototype.init = function() {
@@ -76,18 +87,19 @@ tuna.ui.buttons.ButtonGroup.prototype.init = function() {
     var actionSelectors =
         tuna.dom.getAttributesData(this._target, 'data-action-');
 
-    var selectors = [];
-    var selector = null;
     for (var action in actionSelectors) {
-        selector = actionSelectors[action];
-        this.__selectorActions[selector] = action;
+        this.__selectorActions[actionSelectors[action]] = action;
+    }
+
+    var selectors = [];
+    for (var selector in this.__selectorActions) {
         selectors.push(selector);
     }
 
-    this.__buttonsSelector = selectors.join(',');
+    this._buttonsSelector = selectors.join(',');
 
     tuna.dom.addChildEventListener
-        (this._target, this.__buttonsSelector, 'click', this.__clickHandler);
+        (this._target, this._buttonsSelector, 'click', this.__clickHandler);
 };
 
 
@@ -96,14 +108,16 @@ tuna.ui.buttons.ButtonGroup.prototype.init = function() {
  */
 tuna.ui.buttons.ButtonGroup.prototype.destroy = function() {
     tuna.dom.removeChildEventListener
-        (this._target, this.__buttonsSelector, 'click', this.__clickHandler);
+        (this._target, this._buttonsSelector, 'click', this.__clickHandler);
 
-    this.__buttonsSelector = '';
-    this.__classActions = {};
-    
-    while (this.__buttons.length > 0) {
-        this.__buttons.shift().destroy();
+    for (var id in this._buttons) {
+        this._buttons[id].destroy();
     }
+
+    this._buttonsSelector = '';
+    this._buttons = {};
+
+    this.__selectorActions = {};
 
     this._destroyFactory();
 
@@ -126,4 +140,32 @@ tuna.ui.buttons.ButtonGroup.prototype._createFactory = function() {
  */
 tuna.ui.buttons.ButtonGroup.prototype._destroyFactory = function() {
     this._buttonFactory = null;
+};
+
+
+/**
+ * @param {!tuna.ui.Widget} button
+ * @protected
+ */
+tuna.ui.buttons.ButtonGroup.prototype._saveButton = function(button) {
+    var target = button.getTarget();
+    if (target.id === '') {
+        target.id = 'button_' + tuna.ui.__lastId++;
+    }
+
+    this._buttons[target.id] = button;
+};
+
+
+/**
+ * @param {!Node} target
+ * @return {tuna.ui.Widget}
+ * @protected
+ */
+tuna.ui.buttons.ButtonGroup.prototype._getButton = function(target) {
+    if (target.id !== '') {
+        return this._buttons[target.id] || null;
+    }
+
+    return null;
 };

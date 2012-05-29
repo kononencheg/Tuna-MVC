@@ -3,7 +3,7 @@
  * @extends tuna.ui.Widget
  * @param {!Node} target
  */
-tuna.ui.forms.FormInput = function(target) {
+tuna.ui.forms.InputWrapper = function(target) {
     tuna.ui.Widget.call(this, target);
 
     /**
@@ -19,12 +19,12 @@ tuna.ui.forms.FormInput = function(target) {
     this.__defaultMessage = '';
 };
 
-tuna.utils.extend(tuna.ui.forms.FormInput, tuna.ui.Widget);
+tuna.utils.extend(tuna.ui.forms.InputWrapper, tuna.ui.Widget);
 
 /**
  * @override
  */
-tuna.ui.forms.FormInput.prototype.init = function() {
+tuna.ui.forms.InputWrapper.prototype.init = function() {
     this.__message = tuna.dom.selectOne('.j-message', this._target);
 
     if (this.__message !== null) {
@@ -35,7 +35,7 @@ tuna.ui.forms.FormInput.prototype.init = function() {
 /**
  * @param {string} message
  */
-tuna.ui.forms.FormInput.prototype.showErrorMessage = function(message) {
+tuna.ui.forms.InputWrapper.prototype.showErrorMessage = function(message) {
     tuna.dom.addClass(this._target, 'error');
 
     if (this.__message !== null) {
@@ -44,7 +44,7 @@ tuna.ui.forms.FormInput.prototype.showErrorMessage = function(message) {
 };
 
 
-tuna.ui.forms.FormInput.prototype.cleanup = function() {
+tuna.ui.forms.InputWrapper.prototype.cleanup = function() {
     tuna.dom.removeClass(this._target, 'error');
     if (this.__message !== null) {
         this.__message.innerHTML = this.__defaultMessage;

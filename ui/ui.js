@@ -82,6 +82,13 @@ tuna.ui.transformers = {};
 
 /**
  * @private
+ * @type {number}
+ */
+tuna.ui.__lastId = 0;
+
+
+/**
+ * @private
  * @type {!Object.<string, !tuna.ui.IWidgetFactory>}
  */
 tuna.ui.__factoryTable = {};

@@ -1,3 +1,6 @@
+
+
+
 /**
  * @constructor
  * @extends tuna.ui.Widget
@@ -8,45 +11,66 @@ tuna.ui.popups.Popup = function(target, opt_container) {
     tuna.ui.Widget.call(this, target, opt_container);
 
     /**
-     * @private
-     * @type boolean
+     * @type {!tuna.ui.buttons.ButtonGroup}
+     * @protected
      */
-    this.__isInit = false;
+    this._controls = new tuna.ui.buttons.ButtonGroup(target, opt_container);
 
+    /**
+     * @type {function()}
+     * @private
+     */
+    this.__close = tuna.utils.bind(this.close, this);
+
+    /**
+     * @type {function()}
+     * @private
+     */
+    this.__apply = tuna.utils.bind(this.apply, this);
+
+
+    this._setDefaultOption('close-button-selector', '.j-popup-close');
+    this._setDefaultOption('apply-button-selector', '.j-popup-apply');
 };
 
+
 tuna.utils.extend(tuna.ui.popups.Popup, tuna.ui.Widget);
+
 
 /**
  * @override
  */
 tuna.ui.popups.Popup.prototype.init = function() {
-    if (!this.__isInit) {
-        var self = this;
+    this._controls.addAction
+        ('close', this.getStringOption('close-button-selector'));
 
-        tuna.dom.addChildEventListener(
-            this._target, '.j-popup-close', 'click',
-            function(event) {
-                tuna.dom.preventDefault(event);
-                self.close();
-            }
-        );
+    this._controls.addAction
+        ('apply', this.getStringOption('apply-button-selector'));
 
-        tuna.dom.addChildEventListener(
-            this._target, '.j-popup-apply', 'click',
-            function(event) {
-                tuna.dom.preventDefault(event);
-                self.apply();
-            }
-        );
-    }
+    this._controls.init();
+
+    this._controls.addEventListener('close', this.__close);
+    this._controls.addEventListener('apply', this.__apply);
 };
+
+
+/**
+ * @override
+ */
+tuna.ui.popups.Popup.prototype.destroy = function() {
+    this._controls.removeEventListener('close', this.__close);
+    this._controls.removeEventListener('apply', this.__apply);
+    this._controls.destroy();
+
+    tuna.ui.Widget.prototype.destroy.call(this);
+};
+
 
 /**
  * @return {boolean}
  */
 tuna.ui.popups.Popup.prototype.isOpen = function() {
-    return tuna.dom.hasClass(this._target, 'show');
+    return !tuna.dom.hasClass(this._target, 'hide');
 };
 
 
@@ -65,43 +89,23 @@ tuna.ui.popups.Popup.prototype.close = function() {
 
 
 tuna.ui.popups.Popup.prototype.apply = function() {
-    if (this.dispatch('apply', this.__collectData())) {
+    if (this.dispatch('apply')) {
         this.__hide();
     }
 };
+
 
 /**
  * @private
  */
 tuna.ui.popups.Popup.prototype.__hide = function() {
-    tuna.dom.removeClass(this._target, 'show');
+    tuna.dom.addClass(this._target, 'hide');
 };
+
 
 /**
  * @private
  */
 tuna.ui.popups.Popup.prototype.__show = function() {
-    tuna.dom.addClass(this._target, 'show');
-};
-
-/**
- * @private
- * @return {Object.<string, string>}
- */
-tuna.ui.popups.Popup.prototype.__collectData = function() {
-    var form = tuna.dom.selectOne('form.j-popup-form', this._target);
-
-    if (form !== null) {
-        return tuna.ui.forms.serialize(form);
-    }
-
-    return null;
-};
-
-
-/**
- * @override
- */
-tuna.ui.popups.Popup.prototype.clone = function(target, opt_container) {
-    return tuna.ui.popups.create(target, opt_container);
+    tuna.dom.removeClass(this._target, 'hide');
 };

@@ -11,6 +11,12 @@ tuna.ui.nav.Navigation = function(target, opt_container) {
     tuna.ui.selection.WidgetGroup.call(this, target, opt_container);
 
     /**
+     * @type {?string}
+     * @protected
+     */
+    this._defaultIndex = null;
+
+    /**
      * @type {tuna.ui.nav.NavigationPage}
      * @protected
      */
@@ -61,9 +67,19 @@ tuna.ui.nav.Navigation = function(target, opt_container) {
      * @private
      */
      this.__navigateHandler = function(event, button) {
-         var path = button.getTarget().getAttribute('href');
-         if (path !== null) {
-            self.navigate(path, button.getOptions());
+         var href = button.getTarget().getAttribute('href');
+         if (href !== null) {
+             var parsedPath = href.split('?');
+             var path = parsedPath.shift();
+
+             var data = button.getOptions();
+
+             var query = parsedPath.shift();
+             if (query !== undefined) {
+                 tuna.utils.merge(data, tuna.utils.urlDecode(query));
+             }
+
+             self.navigate(path, data);
          }
      };
 
@@ -75,10 +91,10 @@ tuna.ui.nav.Navigation = function(target, opt_container) {
         self.back();
     };
 
-    this._setDefaultOption('item-selector', '.j-navigation-page');
 
-    this._controls.setOption('action-navigate', 'a.j-link');
-    this._controls.setOption('action-back', '.j-history-back');
+    this._setDefaultOption('item-selector', '.j-navigation-page');
+    this._setDefaultOption('navigate-link-selector', 'a.j-link');
+    this._setDefaultOption('back-link-selector', '.j-history-back');
 };
 
 
@@ -98,15 +114,19 @@ tuna.ui.nav.Navigation.prototype.init = function() {
         }
     }
 
+    this._controls.addAction
+        ('navigate', this.getStringOption('navigate-link-selector'));
+
+    this._controls.addAction
+        ('back', this.getStringOption('back-link-selector'));
+
     this._controls.init();
+
     this._controls.addEventListener('navigate', this.__navigateHandler);
     this._controls.addEventListener('back', this.__backHandler);
 
     if (this._target === document.body) {
         tuna.dom.addEventListener(window, 'popstate', this.__backHandler);
-
-        this.navigate
-           (location.pathname, tuna.utils.urlDecode(location.search.substr(1)));
     }
 };
 
@@ -172,10 +192,9 @@ tuna.ui.nav.Navigation.prototype._createFactory = function() {
 tuna.ui.nav.Navigation.prototype.handleCreatedWidget = function(page) {
     if (page instanceof tuna.ui.nav.NavigationPage) {
         page.setNavigation(this);
-
         if (page.isSelected()) {
-            this._currentPage = page;
-            this._currentPage.open();
+            this._defaultIndex = page.getName();
+            page.deselect();
         }
     }
 };
@@ -239,11 +258,15 @@ tuna.ui.nav.Navigation.prototype.back = function() {
  */
 tuna.ui.nav.Navigation.prototype._navigatePath = function(path, opt_data) {
     var index = path.shift();
-    while (index === '' && path.length > 0) {
+    while (index === '' && index !== undefined) {
         index = path.shift();
     }
 
-    if (index !== undefined) {
+    if (index === undefined) {
+        index = this._defaultIndex;
+    }
+
+    if (index !== null) {
         this._handlePath(index, path, opt_data);
         this._openPage(index, opt_data);
 
@@ -405,7 +428,7 @@ tuna.ui.nav.Navigation.prototype.addHandler = function(handler) {
  * @param {!tuna.ui.nav.INavigationHandler} handler
  */
 tuna.ui.nav.Navigation.prototype.removeHandler = function(handler) {
-    var index = tuna.utils.indexOf(handler, this._handlers)
+    var index = tuna.utils.indexOf(handler, this._handlers);
     if (index !== -1) {
         this._handlers.splice(index, 1);
     }
